@@ -43,6 +43,9 @@ def run(plan, args):
         "RPC_URI": el_url
     }
 
+    hardhat_project = "github.com/kurtosis-tech/ssv-demo/ssv-network"
+    hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars)
+
     plan.exec(
         service_name = "hardhat",
         recipe = ExecRecipe(
@@ -50,10 +53,36 @@ def run(plan, args):
         )
     )
 
-    hardhat_project = "github.com/kurtosis-tech/ssv-demo/ssv-network"
-    hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars)
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm install"]
+        )
+    )
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", 'npm install --save-dev "@nomicfoundation/hardhat-network-helpers@^1.0.0" "@nomicfoundation/hardhat-chai-matchers@^1.0.0" "@nomiclabs/hardhat-etherscan@^3.0.0" "@typechain/ethers-v5@^10.1.0" "@typechain/hardhat@^6.1.2" "chai@^4.2.0" "hardhat-gas-reporter@^1.0.8" "solidity-coverage@^0.8.1" "typechain@^8.1.0"']
+        )
+    )
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm install"]
+        )
+    )
     
     hardhat_module.compile(plan)
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cd /tmp/hardhat && npx hardhat test --network localnet"]
+        )
+    )
+
     hardhat_module.run(plan, "scripts/deploy-all.ts", "localnet")
     # hardhat_module.cleanup(plan)
 
