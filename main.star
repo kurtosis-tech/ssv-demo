@@ -17,7 +17,7 @@ def run(plan, args):
     el_url = "http://{0}:{1}".format(el_ip_addr, el_client_port)
 
     beacon_node_addr = participants[0].cl_client_context.ip_addr
-    beacon_node_port = participants[0].cl_client_context.ws_port_num
+    beacon_node_port = participants[0].cl_client_context.http_port_num
     beacon_url = "http:///{0}:{1}".format(beacon_node_addr, beacon_node_port)
     
     template_data = {
