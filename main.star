@@ -1,18 +1,20 @@
 eth_network_package = import_module("github.com/kurtosis-tech/eth-network-package/main.star")
 hardhat_module = import_module("github.com/kurtosis-tech/web3-tools/hardhat.star")
 
-SSV_NODE_IMAGE = "ssvnode:latest"
+SSV_NODE_IMAGE = "bloxstaking/ssv-node:latest"
 
 ACCOUNT_FROM_ETH = "ef5177cd0b6b21c87db5a0bf35d4084a8a57a9d6a064f86d51ac85f2b873a4e2"
 
 def run(plan, args):
+    launch_ssv_node(plan, "rpc_url")
+
     participants, _ = eth_network_package.run(plan, args)
     el_client_rpc_ip_addr = participants[0].el_client_context.ip_addr
     el_client_rpc_port = participants[0].el_client_context.rpc_port_num
     rpc_url = "http://{0}:{1}".format(el_client_rpc_ip_addr, el_client_rpc_port)
 
 
-    launch_ssv_node(plan, rpc_url)
+    
 
 
     # hardhat_env_vars = {
@@ -40,7 +42,7 @@ def launch_ssv_node(plan, rpc_url):
         name  = "ssv-service",
         config = ServiceConfig(
             image = SSV_NODE_IMAGE,
-            command = ["start-node"],
+            cmd = ["/go/bin/ssvnode", "start-node"],
             env_vars = env_vars,
         )
     )
