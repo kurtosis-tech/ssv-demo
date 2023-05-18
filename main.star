@@ -41,7 +41,7 @@ def launch_ssv_node(plan, rpc_url):
         name  = "ssv-service",
         config = ServiceConfig(
             image = SSV_NODE_IMAGE,
-            cmd = ["/go/bin/ssvnode", "start-node"],
+            cmd = ["sleep", "99999"],
             env_vars = env_vars,
         )
     )
