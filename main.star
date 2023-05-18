@@ -14,7 +14,7 @@ def run(plan, args):
     plan.print(participants)
     
     el_ip_addr = participants[0].el_client_context.ip_addr
-    el_client_port = participants[0].el_client_context.ws_port_num
+    el_client_port = participants[0].el_client_context.rpc_port_num
     el_url = "http://{0}:{1}".format(el_ip_addr, el_client_port)
 
     beacon_node_addr = participants[0].cl_client_context.ip_addr
