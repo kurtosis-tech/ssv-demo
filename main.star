@@ -5,7 +5,8 @@ SSV_NODE_IMAGE = "bloxstaking/ssv-node:latest"
 
 ACCOUNT_FROM_ETH = "ef5177cd0b6b21c87db5a0bf35d4084a8a57a9d6a064f86d51ac85f2b873a4e2"
 
-ETH_NETWORK_ID = "3151908"
+# allowed values are prater/pyrmont/mainnet
+NETOWRK_NAME = "parter"
 
 def run(plan, args):
     participants, _ = eth_network_package.run(plan, args)
@@ -18,11 +19,11 @@ def run(plan, args):
 
     beacon_node_addr = participants[0].cl_client_context.ip_addr
     beacon_node_port = participants[0].cl_client_context.http_port_num
-    beacon_url = "http:///{0}:{1}".format(beacon_node_addr, beacon_node_port)
+    beacon_url = "http://{0}:{1}".format(beacon_node_addr, beacon_node_port)
     
     template_data = {
         "BeaconNodeAddr": beacon_url,
-        "Network": ETH_NETWORK_ID,
+        "Network": NETOWRK_NAME,
         "ElNodeUrl": el_url,
     }
 
