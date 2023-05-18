@@ -38,17 +38,16 @@ def run(plan, args):
 
     launch_ssv_node(plan, config_artifact)
 
-    # hardhat_env_vars = {
-    #     "RPC_URI": rpc_url
-    # }
-
     # # spin up hardhat
-    # hardhat_project = "github.com/kurtosis-tech/web3-tools/smart-contract-example"
-    # hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars)
+    hardhat_env_vars = {
+        "RPC_URI": rpc_url
+    }
+
+    hardhat_project = "github.com/kurtosis-tech/ssv-demo/ssv-network"
+    hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars)
     
-    # hardhat_module.task(plan, "balances", "localnet")
-    # hardhat_module.compile(plan)
-    # hardhat_module.run(plan, "scripts/deploy.ts", "localnet")
+    hardhat_module.compile(plan)
+    hardhat_module.run(plan, "scripts/deploy-all.ts", "localnet")
     # hardhat_module.cleanup(plan)
 
 
