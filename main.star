@@ -40,8 +40,15 @@ def run(plan, args):
 
     # # spin up hardhat
     hardhat_env_vars = {
-        "RPC_URI": rpc_url
+        "RPC_URI": el_url
     }
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python"]
+        )
+    )
 
     hardhat_project = "github.com/kurtosis-tech/ssv-demo/ssv-network"
     hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars)
