@@ -10,6 +10,23 @@ import 'hardhat-storage-layout-changes';
 
 var local_rpc_uri = process.env.RPC_URI || "http://127.0.0.1:9650/ext/bc/C/rpc"
 
+task("accounts", "Prints the list of accounts", async (args, hre): Promise<void> => {
+  const accounts: SignerWithAddress[] = await hre.ethers.getSigners()
+  accounts.forEach((account: SignerWithAddress): void => {
+    console.log(account.address)
+  })
+})
+
+task("balances", "Prints the list of ETH account balances", async (args, hre): Promise<void> => {
+  const accounts: SignerWithAddress[] = await hre.ethers.getSigners()
+  for(const account of accounts){
+    const balance: BigNumber = await hre.ethers.provider.getBalance(
+        account.address
+    );
+    console.log(`${account.address} has balance ${balance.toString()}`);
+  }
+})
+
 const config: HardhatUserConfig = {
   // Your type-safe config goes here
   mocha: {

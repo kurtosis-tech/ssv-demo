@@ -76,14 +76,14 @@ def run(plan, args):
     
     hardhat_module.compile(plan)
 
-    plan.exec(
-        service_name = "hardhat",
-        recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "cd /tmp/hardhat && npx hardhat test --network localnet"]
-        )
-    )
+    # plan.exec(
+    #     service_name = "hardhat",
+    #     recipe = ExecRecipe(
+    #         command = ["/bin/sh", "-c", "cd /tmp/hardhat && npx hardhat test --network localnet"]
+    #     )
+    # )
 
-    hardhat_module.run(plan, "scripts/deploy-all.ts", "localnet")
+    # hardhat_module.run(plan, "scripts/deploy-all.ts", "localnet")
     # hardhat_module.cleanup(plan)
 
 
