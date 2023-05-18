@@ -34,7 +34,6 @@ def run(plan, args):
 
 def launch_ssv_node(plan, rpc_url):
     env_vars = {
-        "CONFIG_PATH": "./config/config.yaml",
         "_ETH_NODE_URL": rpc_url,
         "_OWNER_PRIVATE_KEY": ACCOUNT_FROM_ETH,
     }
