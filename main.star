@@ -57,7 +57,7 @@ def launch_ssv_node(plan, config_artifact):
         name  = "ssv-service",
         config = ServiceConfig(
             image = SSV_NODE_IMAGE,
-            cmd = ["sleep", "99999"],
+            cmd = ["make", "BUILD_PATH=/go/bin/ssvnode", "start-node"],
             ports = {
                 "tcp": PortSpec(number = 13001, transport_protocol = "TCP"),
                 "udp": PortSpec(number = 12001, transport_protocol = "UDP")
