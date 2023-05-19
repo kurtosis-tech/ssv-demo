@@ -1,4 +1,4 @@
-eth_network_package = import_module("github.com/kurtosis-tech/eth-network-package/main.star")
+eth_network_package = import_module("github.com/kurtosis-tech/eth-network-package/main.star@gyani/lower-balance")
 hardhat_module = import_module("github.com/kurtosis-tech/web3-tools/hardhat.star")
 
 SSV_NODE_IMAGE = "bloxstaking/ssv-node:latest"
@@ -6,9 +6,11 @@ SSV_NODE_IMAGE = "bloxstaking/ssv-node:latest"
 ACCOUNT_FROM_ETH = "ef5177cd0b6b21c87db5a0bf35d4084a8a57a9d6a064f86d51ac85f2b873a4e2"
 
 # allowed values are prater/pyrmont/mainnet
-NETOWRK_NAME = "prater"
+NETWORK_NAME = "prater"
 
 def run(plan, args):
+    args["seconds_per_slot"] = 1
+
     participants, _ = eth_network_package.run(plan, args)
 
     plan.print(participants)
@@ -23,7 +25,7 @@ def run(plan, args):
     
     template_data = {
         "BeaconNodeAddr": beacon_url,
-        "Network": NETOWRK_NAME,
+        "Network": NETWORK_NAME,
         "ElNodeUrl": el_url,
     }
 
@@ -38,19 +40,43 @@ def run(plan, args):
 
     launch_ssv_node(plan, config_artifact)
 
-    # hardhat_env_vars = {
-    #     "RPC_URI": rpc_url
-    # }
-
     # # spin up hardhat
-    # hardhat_project = "github.com/kurtosis-tech/web3-tools/smart-contract-example"
-    # hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars)
-    
-    # hardhat_module.task(plan, "balances", "localnet")
-    # hardhat_module.compile(plan)
-    # hardhat_module.run(plan, "scripts/deploy.ts", "localnet")
-    # hardhat_module.cleanup(plan)
+    hardhat_env_vars = {
+        "RPC_URI": el_url
+    }
 
+    hardhat_project = "github.com/kurtosis-tech/ssv-demo/ssv-network"
+    hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars)
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python"]
+        )
+    )
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm install"]
+        )
+    )
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", 'cd /tmp/hardhat && npm install --save-dev "@nomicfoundation/hardhat-network-helpers@^1.0.0" "@nomicfoundation/hardhat-chai-matchers@^1.0.0" "@nomiclabs/hardhat-etherscan@^3.0.0" "@typechain/ethers-v5@^10.1.0" "@typechain/hardhat@^6.1.2" "chai@^4.2.0" "hardhat-gas-reporter@^1.0.8" "solidity-coverage@^0.8.1" "typechain@^8.1.0"']
+        )
+    )
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm install"]
+        )
+    )
+    
+    hardhat_module.compile(plan)
 
 
 def launch_ssv_node(plan, config_artifact):
