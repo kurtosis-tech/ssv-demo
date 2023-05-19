@@ -39,7 +39,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 2000
+            runs: 200
           }
         }
       }
@@ -65,6 +65,7 @@ const config: HardhatUserConfig = {
         "df9bb6de5d3dc59595bcaa676397d837ff49441d211878c024eabda2cd067c9f",
         "7da08f856b5956d40a72968f93396f6acff17193f013e8053f6fbb6c08c194d6",
       ],
+      allowUnlimitedContractSize: true
     },  
   },
   etherscan: {
