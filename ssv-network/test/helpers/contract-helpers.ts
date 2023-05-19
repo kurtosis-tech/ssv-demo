@@ -102,6 +102,8 @@ export const initializeContract = async () => {
 
   await DB.registerAuth.contract.deployed();
 
+  console.log("auth deployed")
+
   DB.ssvNetwork.contract = await upgrades.deployProxy(ssvNetwork, [
     CONFIG.initialVersion,
     DB.ssvToken.address,
@@ -120,6 +122,8 @@ export const initializeContract = async () => {
 
   await DB.ssvNetwork.contract.deployed();
 
+  console.log("ssv network deployed")
+
   await DB.registerAuth.contract.setAuth(DB.owners[0].address, [true, true]);
 
   DB.ssvViews.contract = await upgrades.deployProxy(ssvViews, [
@@ -132,6 +136,8 @@ export const initializeContract = async () => {
   await DB.ssvViews.contract.deployed();
 
   DB.ssvNetwork.owner = DB.owners[0];
+
+  console.log("minting")
 
   await DB.ssvToken.mint(DB.owners[1].address, '10000000000000000000');
   await DB.ssvToken.mint(DB.owners[2].address, '10000000000000000000');
