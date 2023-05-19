@@ -9,6 +9,8 @@ ACCOUNT_FROM_ETH = "ef5177cd0b6b21c87db5a0bf35d4084a8a57a9d6a064f86d51ac85f2b873
 NETWORK_NAME = "prater"
 
 def run(plan, args):
+    args["seconds_per_slot"] = 1
+
     participants, _ = eth_network_package.run(plan, args)
 
     plan.print(participants)

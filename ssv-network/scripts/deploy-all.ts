@@ -1,7 +1,6 @@
 import { ethers, upgrades } from 'hardhat';
 
 async function deploy() {
-  const ssvTokenAddress = process.env.SSV_TOKEN_ADDRESS;
 
   const [deployer] = await ethers.getSigners();
   console.log(`Deploying contracts with the account:${deployer.address}`);
@@ -16,18 +15,24 @@ async function deploy() {
   await registerAuth.deployed();
   console.log(`RegisterAuth proxy deployed to: ${registerAuth.address}`);
 
+  const ssvToken = await ethers.getContractFactory('SSVTokenMock');
+  let ssvTokenDeploy = await ssvToken.deploy();
+  await ssvTokenDeploy.deployed();
+
+  const ssvTokenAddress = ssvTokenDeploy.address;
+
   // deploy SSVNetwork
   const ssvNetworkFactory = await ethers.getContractFactory('SSVNetwork');
   console.log(`Deploying SSVNetwork with ssvToken ${ssvTokenAddress}`);
   const ssvNetwork = await upgrades.deployProxy(ssvNetworkFactory, [
-    process.env.INITIAL_VERSION,
+    "0.0.1",
     ssvTokenAddress,
-    process.env.OPERATOR_MAX_FEE_INCREASE,
-    process.env.DECLARE_OPERATOR_FEE_PERIOD,
-    process.env.EXECUTE_OPERATOR_FEE_PERIOD,
-    process.env.MINIMUM_BLOCKS_BEFORE_LIQUIDATION,
-    process.env.VALIDATORS_PER_OPERATOR_LIMIT,
-    process.env.MINIMUM_LIQUIDATION_COLLATERAL
+    1000,
+    3600,
+    86400,
+    100800,
+    200000000,
+    500,
   ],
     {
       kind: "uups",
