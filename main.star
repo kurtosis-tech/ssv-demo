@@ -78,6 +78,8 @@ def run(plan, args):
     
     hardhat_module.compile(plan)
 
+    hardhat_module.run(plan, "scripts/deploy-all.ts", "localnet")
+
 
 def launch_ssv_node(plan, config_artifact):
     plan.add_service(
