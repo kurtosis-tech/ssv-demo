@@ -84,9 +84,9 @@ def run(plan, args):
     hardhat_module.compile(plan)
 
     # have to wait for at least block to be mined before deploying contract
-    wait_until_node_reached_block(plan, 0, 1)
+    wait_until_node_reached_block(plan, "el-client-0", 1)
 
-    hardhat_module.run("sripts/deploy-all.ts", "localnet")
+    hardhat_module.run(plan, "sripts/deploy-all.ts", "localnet")
 
 
 def launch_ssv_node(plan, config_artifact):
