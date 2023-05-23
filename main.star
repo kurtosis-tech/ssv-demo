@@ -1,4 +1,4 @@
-eth_network_package = import_module("github.com/kurtosis-tech/eth-network-package/main.star@no-genesis-low-block-time")
+eth_network_package = import_module("github.com/kurtosis-tech/eth-network-package/main.star@high-but-low")
 hardhat_module = import_module("github.com/kurtosis-tech/web3-tools/hardhat.star")
 
 SSV_NODE_IMAGE = "bloxstaking/ssv-node:latest"
