@@ -14,7 +14,10 @@ BLOCK_HASH_FIELD = "block-hash"
 JQ_PAD_HEX_FILTER = """{} | ascii_upcase | split("") | map({{"x": 0, "0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "A": 10, "B": 11, "C": 12, "D": 13, "E": 14, "F": 15}}[.]) | reduce .[] as $item (0; . * 16 + $item)"""
 
 def run(plan, args):
-    args["seconds_per_slot"] = 1
+    args["network_params"] = {
+        "seconds_per_slot": 1,
+        "slots_per_epoch": 1,
+    }
 
     participants, _ = eth_network_package.run(plan, args)
 
