@@ -48,8 +48,16 @@ def run(plan, args):
     )
 
     launch_ssv_node(plan, config_artifact, num_nodes)
+    
 
-    # # spin up hardhat
+    # have to wait for at least block to be mined before deploying contract
+    wait_until_node_reached_block(plan, "el-client-0", 1)
+
+    # setup and run hardhat
+    hardhat_module.run(plan, el_url)
+
+def setup_and_run_hardhat(plan, el_url):
+# # spin up hardhat
     hardhat_env_vars = {
         "RPC_URI": el_url
     }
@@ -86,11 +94,6 @@ def run(plan, args):
     )
     
     hardhat_module.compile(plan)
-
-    # have to wait for at least block to be mined before deploying contract
-    wait_until_node_reached_block(plan, "el-client-0", 1)
-
-    hardhat_module.run(plan, "scripts/deploy-all.ts", "localnet")
 
 
 def launch_ssv_node(plan, config_artifact, num_nodes):
