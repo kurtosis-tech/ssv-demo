@@ -13,8 +13,12 @@ BLOCK_NUMBER_FIELD = "block-number"
 BLOCK_HASH_FIELD = "block-hash"
 JQ_PAD_HEX_FILTER = """{} | ascii_upcase | split("") | map({{"x": 0, "0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "A": 10, "B": 11, "C": 12, "D": 13, "E": 14, "F": 15}}[.]) | reduce .[] as $item (0; . * 16 + $item)"""
 
+
+DEFAULT_SSV_NODES = 4
+SSV_NODE_PREFIX = "ssv-nodes-"
+
 def run(plan, args):
-    args["seconds_per_slot"] = 1
+    num_nodes = args.get("num_nodes", DEFAULT_SSV_NODES)
 
     participants, _ = eth_network_package.run(plan, args)
 
@@ -43,7 +47,7 @@ def run(plan, args):
         }
     )
 
-    launch_ssv_node(plan, config_artifact)
+    launch_ssv_node(plan, config_artifact, num_nodes)
 
     # # spin up hardhat
     hardhat_env_vars = {
@@ -89,10 +93,10 @@ def run(plan, args):
     hardhat_module.run(plan, "scripts/deploy-all.ts", "localnet")
 
 
-def launch_ssv_node(plan, config_artifact):
-    plan.add_service(
-        name  = "ssv-service",
-        config = ServiceConfig(
+def launch_ssv_node(plan, config_artifact, num_nodes):
+    nodes = {}
+    for index in range(0, num_nodes):
+        config =ServiceConfig(
             image = SSV_NODE_IMAGE,
             cmd = ["/go/bin/ssvnode", "start-node", "--config", "/tmp/config.yml"],
             ports = {
@@ -107,6 +111,9 @@ def launch_ssv_node(plan, config_artifact):
                 "CONFIG_PATH": "/tmp/config.yml"
             }
         )
+        nodes[SSV_NODE_PREFIX + str(index)] = config
+    plan.add_services(
+        nodes
     )
 
 
