@@ -130,28 +130,28 @@ def ssv_presetup(plan, num_nodes):
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
-            command = ["apt", "install", "git"]
+            command = ["apt", "install", "-y", "git"]
         )
     )
 
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
-            command = ["apt", "install", "jq"]
+            command = ["apt", "install", "-y", "jq"]
         )
     )
 
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
-            command = ["apt", "install", "make"]
+            command = ["apt", "install", "-y", "make"]
         )
     )
 
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
-            command = ["apt", "install", "golang-go"]
+            command = ["apt", "install", "-y", "golang-go"]
         )
     )
 
