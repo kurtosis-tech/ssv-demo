@@ -22,41 +22,41 @@ def run(plan, args):
 
     ssv_presetup(plan, num_nodes)
 
-    participants, _ = eth_network_package.run(plan, args)
+    # participants, _ = eth_network_package.run(plan, args)
 
-    plan.print(participants)
+    # plan.print(participants)
 
-    el_ip_addr = participants[0].el_client_context.ip_addr
-    el_client_port = participants[0].el_client_context.rpc_port_num
-    el_url = "http://{0}:{1}".format(el_ip_addr, el_client_port)
+    # el_ip_addr = participants[0].el_client_context.ip_addr
+    # el_client_port = participants[0].el_client_context.rpc_port_num
+    # el_url = "http://{0}:{1}".format(el_ip_addr, el_client_port)
 
-    beacon_node_addr = participants[0].cl_client_context.ip_addr
-    beacon_node_port = participants[0].cl_client_context.http_port_num
-    beacon_url = "http://{0}:{1}".format(beacon_node_addr, beacon_node_port)
+    # beacon_node_addr = participants[0].cl_client_context.ip_addr
+    # beacon_node_port = participants[0].cl_client_context.http_port_num
+    # beacon_url = "http://{0}:{1}".format(beacon_node_addr, beacon_node_port)
 
-    template_data = {
-        "BeaconNodeAddr": beacon_url,
-        "Network": NETWORK_NAME,
-        "ElNodeUrl": el_url,
-    }
+    # template_data = {
+    #     "BeaconNodeAddr": beacon_url,
+    #     "Network": NETWORK_NAME,
+    #     "ElNodeUrl": el_url,
+    # }
 
-    config_artifact = plan.render_templates(
-        config = {
-            "config.yml": struct(
-                template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config.yml.tmpl"),
-                data = template_data
-            )
-        }
-    )
+    # config_artifact = plan.render_templates(
+    #     config = {
+    #         "config.yml": struct(
+    #             template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config.yml.tmpl"),
+    #             data = template_data
+    #         )
+    #     }
+    # )
 
-    launch_ssv_node(plan, config_artifact, num_nodes)
+    # launch_ssv_node(plan, config_artifact, num_nodes)
 
 
-    # have to wait for at least block to be mined before deploying contract
-    wait_until_node_reached_block(plan, "el-client-0", 1)
+    # # have to wait for at least block to be mined before deploying contract
+    # wait_until_node_reached_block(plan, "el-client-0", 1)
 
-    # setup and run hardhat
-    hardhat_module.run(plan, el_url)
+    # # setup and run hardhat
+    # hardhat_module.run(plan, el_url)
 
 
 def setup_and_run_hardhat(plan, el_url):
