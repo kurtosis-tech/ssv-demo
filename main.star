@@ -103,6 +103,7 @@ def ssv_presetup(plan, num_nodes):
     workdir = "/tmp/workdir"
 
     local_script = plan.upload_files("github.com/kurtosis-tech/ssv-demo/static_files/generate_local_config.sh")
+    cloner = plan.upload_files("github.com/kurtosis-tech/ssv-demo/static_files/cloner.sh")
 
     plan.add_service(
         name = "ssv-setup",
@@ -111,11 +112,27 @@ def ssv_presetup(plan, num_nodes):
             entrypoint = ["sleep", "99999"],
             files = {
                 workdir: local_script,
+                "/tmp/coner" : cloner
             }
         )
     )
 
     ssv_keys_url = "https://github.com/bloxapp/ssv-keys/releases/download/v0.0.20/ssv-keys-lin"
+
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["apt", "update"]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["apt", "install", "git"]
+        )
+    )
 
     plan.exec(
         service_name = "ssv-setup",
@@ -123,6 +140,21 @@ def ssv_presetup(plan, num_nodes):
             command = ["apt", "install", "jq"]
         )
     )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["apt", "install", "make"]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["apt", "install", "golang-go"]
+        )
+    )
+
 
     plan.exec(
         service_name = "ssv-setup",
@@ -152,7 +184,19 @@ def ssv_presetup(plan, num_nodes):
         )
     )
 
-    localstuff = "https://raw.githubusercontent.com/bloxapp/ssv/858647af42f82112b24db5b059e1ee42064d0d81/scripts/generate_local_config.sh"
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "/tmp/cloner/cloner.sh"]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cd /tmp/workdir/ssv & make build"]
+        )
+    )
 
     password = "12345678"
 
