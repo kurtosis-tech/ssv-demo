@@ -129,6 +129,13 @@ def ssv_presetup(plan, num_nodes):
 
     install_dependency(plan, ["git", "jq", "golang-go", "make", "wget"])
 
+    commands = [
+        "wget  https://go.dev/dl/go1.20.2.linux-amd64.tar.gz",
+        "rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz"
+    ]
+
+    run_commands(commands)
+
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
@@ -167,7 +174,7 @@ def ssv_presetup(plan, num_nodes):
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "cd /tmp/workdir/ssv & make build"]
+            command = ["/bin/sh", "-c", "make -C /tmp/workdir/ssv build"]
         )
     )
 
@@ -181,6 +188,14 @@ def ssv_presetup(plan, num_nodes):
     )
 
 
+def run_commands(plan);
+    for command in commands:
+        plan.exec(
+            service_name = "ssv-setup",
+            recipe = ExecRecipe(
+                command = ["/bin/sh", "-c", command]
+            )
+        )
 
 
 def launch_ssv_node(plan, config_artifact, num_nodes):
