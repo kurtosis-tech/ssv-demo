@@ -159,6 +159,13 @@ def ssv_presetup(plan, num_nodes):
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
+            command = ["apt", "install", "-y", "wget"]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
             command = ["/bin/sh", "-c", """wget -q -O /usr/bin/yq $(wget -q -O - https://api.github.com/repos/mikefarah/yq/releases/latest | jq -r '.assets[] | select(.name == "yq_linux_amd64") | .browser_download_url')"""]
         )
     )
