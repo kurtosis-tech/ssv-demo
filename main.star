@@ -120,7 +120,7 @@ def ssv_presetup(plan, num_nodes):
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
-            command = ["apk", "add", "jq"]
+            command = ["apt", "install", "jq"]
         )
     )
 
