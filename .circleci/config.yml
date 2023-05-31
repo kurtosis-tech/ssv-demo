@@ -8,6 +8,8 @@ executors:
 jobs:
   run_starlark:
     executor: ubuntu_vm
+    # the build step can be slow so making this xlarge
+    resource_class: xlarge
     steps:
 
       # Set up Kurtosis
