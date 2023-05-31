@@ -127,7 +127,7 @@ def ssv_presetup(plan, num_nodes):
         )
     )
 
-    install_dependency(plan, ["git", "jq", "golang-go", "make", "wget"])
+    install_dependency(plan, ["git", "jq", "golang-go", "make", "wget", "dnsutils"])
 
     commands = [
         "wget  https://go.dev/dl/go1.19.2.linux-amd64.tar.gz",
