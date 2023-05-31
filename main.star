@@ -127,41 +127,7 @@ def ssv_presetup(plan, num_nodes):
         )
     )
 
-    plan.exec(
-        service_name = "ssv-setup",
-        recipe = ExecRecipe(
-            command = ["apt", "install", "-y", "git"]
-        )
-    )
-
-    plan.exec(
-        service_name = "ssv-setup",
-        recipe = ExecRecipe(
-            command = ["apt", "install", "-y", "jq"]
-        )
-    )
-
-    plan.exec(
-        service_name = "ssv-setup",
-        recipe = ExecRecipe(
-            command = ["apt", "install", "-y", "make"]
-        )
-    )
-
-    plan.exec(
-        service_name = "ssv-setup",
-        recipe = ExecRecipe(
-            command = ["apt", "install", "-y", "golang-go"]
-        )
-    )
-
-
-    plan.exec(
-        service_name = "ssv-setup",
-        recipe = ExecRecipe(
-            command = ["apt", "install", "-y", "wget"]
-        )
-    )
+    install_dependency(plan, ["git", "jq", "golang-go", "make", "wget"])
 
     plan.exec(
         service_name = "ssv-setup",
@@ -240,6 +206,15 @@ def launch_ssv_node(plan, config_artifact, num_nodes):
         nodes
     )
 
+
+def install_dependency(plan, dependencies):
+    for dependency in dependencies:
+        plan.exec(
+            service_name = "ssv-setup",
+            recipe = ExecRecipe(
+                command = ["apt", "install", "-y", dependency]
+            )
+        )
 
 
 def wait_until_node_reached_block(plan, node_id, target_block_number_int):
