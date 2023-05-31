@@ -130,10 +130,8 @@ def ssv_presetup(plan, num_nodes):
     install_dependency(plan, ["git", "jq", "golang-go", "make", "wget", "dnsutils"])
 
     commands = [
-        "wget  https://go.dev/dl/go1.19.2.linux-amd64.tar.gz",
         "rm -rf /usr/local/go && tar -C /usr/local -xzf go1.19.2.linux-amd64.tar.gz",
-        "cp /usr/local/go/bin/go /usr/bin/go",
-        "go version"
+        "export PATH=$PATH:/usr/local/go/bin"
     ]
 
     run_commands(plan, commands)
@@ -185,7 +183,7 @@ def ssv_presetup(plan, num_nodes):
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "{0}/generate_local_config.sh {1} {2} {3} {4}".format(workdir, num_nodes, workdir + "/keystore.json", password, workdir + "/ssv-keys-lin")]
+            command = ["/bin/sh", "-c", "PATH=$PATH:/usr/local/go/bin {0}/generate_local_config.sh {1} {2} {3} {4}".format(workdir, num_nodes, workdir + "/keystore.json", password, workdir + "/ssv-keys-lin")]
         )
     )
 
