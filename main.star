@@ -112,7 +112,7 @@ def ssv_presetup(plan, num_nodes):
             entrypoint = ["sleep", "99999"],
             files = {
                 workdir: local_script,
-                "/tmp/coner" : cloner
+                "/tmp/cloner" : cloner
             }
         )
     )
