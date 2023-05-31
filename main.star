@@ -134,7 +134,7 @@ def ssv_presetup(plan, num_nodes):
         "rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz"
     ]
 
-    run_commands(commands)
+    run_commands(plan, commands)
 
     plan.exec(
         service_name = "ssv-setup",
