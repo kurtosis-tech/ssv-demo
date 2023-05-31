@@ -20,10 +20,12 @@ SSV_NODE_PREFIX = "ssv-nodes-"
 def run(plan, args):
     num_nodes = args.get("num_nodes", DEFAULT_SSV_NODES)
 
+    ssv_presetup(plan, num_nodes)
+
     participants, _ = eth_network_package.run(plan, args)
 
     plan.print(participants)
-    
+
     el_ip_addr = participants[0].el_client_context.ip_addr
     el_client_port = participants[0].el_client_context.rpc_port_num
     el_url = "http://{0}:{1}".format(el_ip_addr, el_client_port)
@@ -31,7 +33,7 @@ def run(plan, args):
     beacon_node_addr = participants[0].cl_client_context.ip_addr
     beacon_node_port = participants[0].cl_client_context.http_port_num
     beacon_url = "http://{0}:{1}".format(beacon_node_addr, beacon_node_port)
-    
+
     template_data = {
         "BeaconNodeAddr": beacon_url,
         "Network": NETWORK_NAME,
@@ -48,13 +50,14 @@ def run(plan, args):
     )
 
     launch_ssv_node(plan, config_artifact, num_nodes)
-    
+
 
     # have to wait for at least block to be mined before deploying contract
     wait_until_node_reached_block(plan, "el-client-0", 1)
 
     # setup and run hardhat
     hardhat_module.run(plan, el_url)
+
 
 def setup_and_run_hardhat(plan, el_url):
 # # spin up hardhat
@@ -92,8 +95,81 @@ def setup_and_run_hardhat(plan, el_url):
             command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm install"]
         )
     )
-    
+
     hardhat_module.compile(plan)
+
+
+def ssv_presetup(plan, num_nodes):
+    ssv_keys_url = "https://github.com/bloxapp/ssv-keys/releases/download/v0.0.20/ssv-keys-lin"
+    plan.add_service(
+        name = "ssv-setup",
+        config = ServiceConfig(
+            image = "alpine:latest",
+            entrypoint = ["sleep", "99999"]
+        )
+    )
+
+    workdir = "/tmp/workdir"
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["apk", "add", "bash"]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["apk", "add", "yq"]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "mkdir {0}".format(workdir, ssv_keys_url)]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cd {0} && wget {1}".format(workdir, ssv_keys_url)]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "chmod +x {0}".format(workdir + "/ssv-keys-lin")]
+        )
+    )
+
+    localstuff = "https://raw.githubusercontent.com/bloxapp/ssv/858647af42f82112b24db5b059e1ee42064d0d81/scripts/generate_local_config.sh"
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cd {0} && wget {1}".format(workdir, localstuff)]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "chmod +x {0}".format(workdir + "/generate_local_config.sh")]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "{0}/generate_local_config.sh {1} {2} {3}".format(workdir, num_nodes, workdir + "/keystore.json", workdir + "/ssv-keys-lin")]
+        )
+    )
+
+
 
 
 def launch_ssv_node(plan, config_artifact, num_nodes):
@@ -139,7 +215,7 @@ def wait_until_node_reached_block(plan, node_id, target_block_number_int):
 
 def get_block_recipe(block_number_hex):
     """
-    Returns the recipe to run to get the block information for block number `block_number_hex` (which should be a 
+    Returns the recipe to run to get the block information for block number `block_number_hex` (which should be a
     hexadecimal string starting with `0x`, i.e. `0x2d`)
     """
     request_body = """{{
