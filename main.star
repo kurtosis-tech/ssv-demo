@@ -188,7 +188,7 @@ def ssv_presetup(plan, num_nodes):
     )
 
 
-def run_commands(plan);
+def run_commands(plan, commands):
     for command in commands:
         plan.exec(
             service_name = "ssv-setup",
