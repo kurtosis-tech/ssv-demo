@@ -13,39 +13,54 @@ BLOCK_NUMBER_FIELD = "block-number"
 BLOCK_HASH_FIELD = "block-hash"
 JQ_PAD_HEX_FILTER = """{} | ascii_upcase | split("") | map({{"x": 0, "0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "A": 10, "B": 11, "C": 12, "D": 13, "E": 14, "F": 15}}[.]) | reduce .[] as $item (0; . * 16 + $item)"""
 
+
+DEFAULT_SSV_NODES = 4
+SSV_NODE_PREFIX = "ssv-nodes-"
+
 def run(plan, args):
-    args["seconds_per_slot"] = 1
+    num_nodes = args.get("num_nodes", DEFAULT_SSV_NODES)
 
-    participants, _ = eth_network_package.run(plan, args)
+    ssv_presetup(plan, num_nodes)
 
-    plan.print(participants)
-    
-    el_ip_addr = participants[0].el_client_context.ip_addr
-    el_client_port = participants[0].el_client_context.rpc_port_num
-    el_url = "http://{0}:{1}".format(el_ip_addr, el_client_port)
+    # participants, _ = eth_network_package.run(plan, args)
 
-    beacon_node_addr = participants[0].cl_client_context.ip_addr
-    beacon_node_port = participants[0].cl_client_context.http_port_num
-    beacon_url = "http://{0}:{1}".format(beacon_node_addr, beacon_node_port)
-    
-    template_data = {
-        "BeaconNodeAddr": beacon_url,
-        "Network": NETWORK_NAME,
-        "ElNodeUrl": el_url,
-    }
+    # plan.print(participants)
 
-    config_artifact = plan.render_templates(
-        config = {
-            "config.yml": struct(
-                template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config.yml.tmpl"),
-                data = template_data
-            )
-        }
-    )
+    # el_ip_addr = participants[0].el_client_context.ip_addr
+    # el_client_port = participants[0].el_client_context.rpc_port_num
+    # el_url = "http://{0}:{1}".format(el_ip_addr, el_client_port)
 
-    launch_ssv_node(plan, config_artifact)
+    # beacon_node_addr = participants[0].cl_client_context.ip_addr
+    # beacon_node_port = participants[0].cl_client_context.http_port_num
+    # beacon_url = "http://{0}:{1}".format(beacon_node_addr, beacon_node_port)
 
-    # # spin up hardhat
+    # template_data = {
+    #     "BeaconNodeAddr": beacon_url,
+    #     "Network": NETWORK_NAME,
+    #     "ElNodeUrl": el_url,
+    # }
+
+    # config_artifact = plan.render_templates(
+    #     config = {
+    #         "config.yml": struct(
+    #             template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config.yml.tmpl"),
+    #             data = template_data
+    #         )
+    #     }
+    # )
+
+    # launch_ssv_node(plan, config_artifact, num_nodes)
+
+
+    # # have to wait for at least block to be mined before deploying contract
+    # wait_until_node_reached_block(plan, "el-client-0", 1)
+
+    # # setup and run hardhat
+    # hardhat_module.run(plan, el_url)
+
+
+def setup_and_run_hardhat(plan, el_url):
+# # spin up hardhat
     hardhat_env_vars = {
         "RPC_URI": el_url
     }
@@ -80,19 +95,116 @@ def run(plan, args):
             command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm install"]
         )
     )
-    
+
     hardhat_module.compile(plan)
 
-    # have to wait for at least block to be mined before deploying contract
-    wait_until_node_reached_block(plan, "el-client-0", 1)
 
-    hardhat_module.run(plan, "scripts/deploy-all.ts", "localnet")
+def ssv_presetup(plan, num_nodes):
+    workdir = "/tmp/workdir"
 
+    local_script = plan.upload_files("github.com/kurtosis-tech/ssv-demo/static_files/generate_local_config.sh")
+    cloner = plan.upload_files("github.com/kurtosis-tech/ssv-demo/static_files/cloner.sh")
+    keystore = plan.upload_files("github.com/kurtosis-tech/ssv-demo/static_files/keystore.json")
 
-def launch_ssv_node(plan, config_artifact):
     plan.add_service(
-        name  = "ssv-service",
+        name = "ssv-setup",
         config = ServiceConfig(
+            image = "amd64/ubuntu",
+            entrypoint = ["sleep", "99999"],
+            files = {
+                workdir: local_script,
+                "/tmp/cloner" : cloner,
+                "/tmp/keystore": keystore
+            }
+        )
+    )
+
+    ssv_keys_url = "https://github.com/bloxapp/ssv-keys/releases/download/v0.0.20/ssv-keys-lin"
+
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["apt", "update"]
+        )
+    )
+
+    install_dependency(plan, ["git", "jq", "make", "wget", "dnsutils", "gcc", "g++-multilib"])
+
+    commands = [
+        "wget  https://go.dev/dl/go1.19.2.linux-amd64.tar.gz",
+        "rm -rf /usr/local/go && tar -C /usr/local -xzf go1.19.2.linux-amd64.tar.gz",
+        "export PATH=$PATH:/usr/local/go/bin"
+    ]
+
+    run_commands(plan, commands)
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", """wget -q -O /usr/bin/yq $(wget -q -O - https://api.github.com/repos/mikefarah/yq/releases/latest | jq -r '.assets[] | select(.name == "yq_linux_amd64") | .browser_download_url')"""]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["chmod", "+x", "/usr/bin/yq"]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cd {0} && wget {1}".format(workdir, ssv_keys_url)]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "chmod +x {0}".format(workdir + "/ssv-keys-lin")]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "/tmp/cloner/cloner.sh"]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "PATH=$PATH:/usr/local/go/bin  make -C /tmp/workdir/ssv build"]
+        )
+    )
+
+    password = "12345678"
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "PATH=$PATH:/usr/local/go/bin {0}/generate_local_config.sh {1} {2} {3} {4}".format(workdir, num_nodes, "/tmp/keystore/keystore.json", password, workdir + "/ssv-keys-lin")]
+        )
+    )
+
+
+def run_commands(plan, commands):
+    for command in commands:
+        plan.exec(
+            service_name = "ssv-setup",
+            recipe = ExecRecipe(
+                command = ["/bin/sh", "-c", command]
+            )
+        )
+
+
+def launch_ssv_node(plan, config_artifact, num_nodes):
+    nodes = {}
+    for index in range(0, num_nodes):
+        config =ServiceConfig(
             image = SSV_NODE_IMAGE,
             cmd = ["/go/bin/ssvnode", "start-node", "--config", "/tmp/config.yml"],
             ports = {
@@ -107,8 +219,20 @@ def launch_ssv_node(plan, config_artifact):
                 "CONFIG_PATH": "/tmp/config.yml"
             }
         )
+        nodes[SSV_NODE_PREFIX + str(index)] = config
+    plan.add_services(
+        nodes
     )
 
+
+def install_dependency(plan, dependencies):
+    for dependency in dependencies:
+        plan.exec(
+            service_name = "ssv-setup",
+            recipe = ExecRecipe(
+                command = ["apt", "install", "-y", dependency]
+            )
+        )
 
 
 def wait_until_node_reached_block(plan, node_id, target_block_number_int):
@@ -129,7 +253,7 @@ def wait_until_node_reached_block(plan, node_id, target_block_number_int):
 
 def get_block_recipe(block_number_hex):
     """
-    Returns the recipe to run to get the block information for block number `block_number_hex` (which should be a 
+    Returns the recipe to run to get the block information for block number `block_number_hex` (which should be a
     hexadecimal string starting with `0x`, i.e. `0x2d`)
     """
     request_body = """{{
