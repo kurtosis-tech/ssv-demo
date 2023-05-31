@@ -100,35 +100,41 @@ def setup_and_run_hardhat(plan, el_url):
 
 
 def ssv_presetup(plan, num_nodes):
-    ssv_keys_url = "https://github.com/bloxapp/ssv-keys/releases/download/v0.0.20/ssv-keys-lin"
+    workdir = "/tmp/workdir"
+
+    local_script = plan.upload_files("github.com/kurtosis-tech/ssv-demo/static_files/generate_local_config.sh")
+
     plan.add_service(
         name = "ssv-setup",
         config = ServiceConfig(
-            image = "alpine:latest",
-            entrypoint = ["sleep", "99999"]
+            image = SSV_NODE_IMAGE,
+            entrypoint = ["sleep", "99999"],
+            files = {
+                workdir: local_script,
+            }
         )
     )
 
-    workdir = "/tmp/workdir"
+    ssv_keys_url = "https://github.com/bloxapp/ssv-keys/releases/download/v0.0.20/ssv-keys-lin"
 
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
-            command = ["apk", "add", "bash"]
-        )
-    )
-
-    plan.exec(
-        service_name = "ssv-setup",
-        recipe = ExecRecipe(
-            command = ["apk", "add", "yq"]
+            command = ["apk", "add", "jq"]
         )
     )
 
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "mkdir {0}".format(workdir, ssv_keys_url)]
+            command = ["/bin/sh", "-c", """wget -q -O /usr/bin/yq $(wget -q -O - https://api.github.com/repos/mikefarah/yq/releases/latest | jq -r '.assets[] | select(.name == "yq_linux_amd64") | .browser_download_url')"""]
+        )
+    )
+
+    plan.exec(
+        service_name = "ssv-setup",
+        recipe = ExecRecipe(
+            command = ["chmod", "+x", "/usr/bin/yq"]
         )
     )
 
@@ -148,24 +154,12 @@ def ssv_presetup(plan, num_nodes):
 
     localstuff = "https://raw.githubusercontent.com/bloxapp/ssv/858647af42f82112b24db5b059e1ee42064d0d81/scripts/generate_local_config.sh"
 
-    plan.exec(
-        service_name = "ssv-setup",
-        recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "cd {0} && wget {1}".format(workdir, localstuff)]
-        )
-    )
+    password = "12345678"
 
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "chmod +x {0}".format(workdir + "/generate_local_config.sh")]
-        )
-    )
-
-    plan.exec(
-        service_name = "ssv-setup",
-        recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "{0}/generate_local_config.sh {1} {2} {3}".format(workdir, num_nodes, workdir + "/keystore.json", workdir + "/ssv-keys-lin")]
+            command = ["/bin/sh", "-c", "{0}/generate_local_config.sh {1} {2} {3} {4}".format(workdir, num_nodes, workdir + "/keystore.json", password, workdir + "/ssv-keys-lin")]
         )
     )
 
