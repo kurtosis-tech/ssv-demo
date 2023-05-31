@@ -107,7 +107,7 @@ def ssv_presetup(plan, num_nodes):
     plan.add_service(
         name = "ssv-setup",
         config = ServiceConfig(
-            image = SSV_NODE_IMAGE,
+            image = "amd64/ubuntu",
             entrypoint = ["sleep", "99999"],
             files = {
                 workdir: local_script,
