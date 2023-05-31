@@ -104,6 +104,7 @@ def ssv_presetup(plan, num_nodes):
 
     local_script = plan.upload_files("github.com/kurtosis-tech/ssv-demo/static_files/generate_local_config.sh")
     cloner = plan.upload_files("github.com/kurtosis-tech/ssv-demo/static_files/cloner.sh")
+    keystore = plan.upload_files("github.com/kurtosis-tech/ssv-demo/static_files/keystore.json")
 
     plan.add_service(
         name = "ssv-setup",
@@ -112,7 +113,8 @@ def ssv_presetup(plan, num_nodes):
             entrypoint = ["sleep", "99999"],
             files = {
                 workdir: local_script,
-                "/tmp/cloner" : cloner
+                "/tmp/cloner" : cloner,
+                "/tmp/keystore": keystore
             }
         )
     )
@@ -184,7 +186,7 @@ def ssv_presetup(plan, num_nodes):
     plan.exec(
         service_name = "ssv-setup",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "PATH=$PATH:/usr/local/go/bin {0}/generate_local_config.sh {1} {2} {3} {4}".format(workdir, num_nodes, workdir + "/keystore.json", password, workdir + "/ssv-keys-lin")]
+            command = ["/bin/sh", "-c", "PATH=$PATH:/usr/local/go/bin {0}/generate_local_config.sh {1} {2} {3} {4}".format(workdir, num_nodes, "/tmp/keystore/keystore.json", password, workdir + "/ssv-keys-lin")]
         )
     )
 
