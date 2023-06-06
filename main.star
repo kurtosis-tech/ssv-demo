@@ -99,7 +99,7 @@ def launch_ssv_node(plan, beacon_url, el_url):
         cmd = []
         if index == 0 :
             files["/tmp"] = node_zero_config
-            cmd = ["/go/bin/ssvnode", "start-boot-node", "--config", "/tmp/config.yml"],
+            cmd = ["/go/bin/ssvnode", "start-boot-node", "--config", "/tmp/config.yml"]
         else:
             template_data["FirstNodeIp"] = nodes[0].ip_address
             config = plan.render_templates(
