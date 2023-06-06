@@ -97,7 +97,7 @@ def launch_ssv_node(plan, beacon_url, el_url):
     for index in range(0, NUM_SSV_NODES):
         files = {}
         if index == 0 :
-            files["config.yml"] = node_zero_config
+            files["/tmp"] = node_zero_config
         else:
             template_data["FirstNodeIp"] = nodes[0].ip_address
             config = plan.render_templates(
@@ -108,7 +108,7 @@ def launch_ssv_node(plan, beacon_url, el_url):
                     )
                 }
             )
-            files["config.yml"] = config
+            files["/tmp"] = config
 
         node = plan.add_service(
             name  = "ssv-service-" + str(index),
