@@ -31,22 +31,7 @@ def run(plan, args):
     beacon_node_port = participants[0].cl_client_context.http_port_num
     beacon_url = "http://{0}:{1}".format(beacon_node_addr, beacon_node_port)
     
-    template_data = {
-        "BeaconNodeAddr": beacon_url,
-        "Network": NETWORK_NAME,
-        "ElNodeUrl": el_url,
-    }
-
-    config_artifact = plan.render_templates(
-        config = {
-            "config.yml": struct(
-                template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config.yml.tmpl"),
-                data = template_data
-            )
-        }
-    )
-
-    launch_ssv_node(plan, config_artifact)
+    launch_ssv_node(plan, beacon_url, el_url)
 
     # # spin up hardhat
     hardhat_env_vars = {
@@ -92,9 +77,40 @@ def run(plan, args):
     hardhat_module.run(plan, "scripts/deploy-all.ts", "localnet")
 
 
-def launch_ssv_node(plan, config_artifact):
+def launch_ssv_node(plan, beacon_url, el_url):
+    template_data = {
+        "BeaconNodeAddr": beacon_url,
+        "Network": NETWORK_NAME,
+        "ElNodeUrl": el_url,
+    }
+
+
+    node_zero_config = plan.render_templates(
+        config = {
+            "config.yml": struct(
+                template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config0.yml.tmpl"),
+                data = template_data
+            )
+        }
+    )
+    nodes = []
     for index in range(0, NUM_SSV_NODES):
-        plan.add_service(
+        files = {}
+        if index == 0 :
+            files["config.yml"] = node_zero_config
+        else:
+            template_data["FirstNodeIp"] = nodes[0].ip_address
+            config = plan.render_templates(
+                config = {
+                    "config.yml": struct(
+                        template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config.yml.tmpl"),
+                        data = template_data
+                    )
+                }
+            )
+            files["config.yml"] = config
+
+        node = plan.add_service(
             name  = "ssv-service-" + str(index),
             config = ServiceConfig(
                 image = SSV_NODE_IMAGE,
@@ -104,14 +120,14 @@ def launch_ssv_node(plan, config_artifact):
                     "udp": PortSpec(number = 12001, transport_protocol = "UDP"),
                     "metrics": PortSpec(number = 15000, transport_protocol = "UDP"),
                 },
-                files = {
-                    "/tmp": config_artifact
-                },
+                files = files,
                 env_vars = {
                     "CONFIG_PATH": "/tmp/config.yml"
                 }
             )
         )
+
+        nodes.append(node)
 
 
 def wait_until_node_reached_block(plan, node_id, target_block_number_int):
