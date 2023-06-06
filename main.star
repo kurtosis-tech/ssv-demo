@@ -96,6 +96,7 @@ def launch_ssv_node(plan, beacon_url, el_url):
     nodes = []
     for index in range(0, NUM_SSV_NODES):
         files = {}
+        cmd = []
         if index == 0 :
             files["/tmp"] = node_zero_config
             cmd = ["/go/bin/ssvnode", "start-boot-node", "--config", "/tmp/config.yml"],
@@ -110,13 +111,13 @@ def launch_ssv_node(plan, beacon_url, el_url):
                 }
             )
             files["/tmp"] = config
-            cmd = ["/go/bin/ssvnode", "start-node", "--config", "/tmp/config.yml"],
+            cmd = ["/go/bin/ssvnode", "start-node", "--config", "/tmp/config.yml"]
 
         node = plan.add_service(
             name  = "ssv-service-" + str(index),
             config = ServiceConfig(
                 image = SSV_NODE_IMAGE,
-                
+                cmd = cmd,
                 ports = {
                     "tcp": PortSpec(number = 13001, transport_protocol = "TCP", wait = None),
                     "udp": PortSpec(number = 12001, transport_protocol = "UDP"),
