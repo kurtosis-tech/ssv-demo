@@ -13,6 +13,9 @@ BLOCK_NUMBER_FIELD = "block-number"
 BLOCK_HASH_FIELD = "block-hash"
 JQ_PAD_HEX_FILTER = """{} | ascii_upcase | split("") | map({{"x": 0, "0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "A": 10, "B": 11, "C": 12, "D": 13, "E": 14, "F": 15}}[.]) | reduce .[] as $item (0; . * 16 + $item)"""
 
+
+NUM_SSV_NODES = 4
+
 def run(plan, args):
     args["seconds_per_slot"] = 1
 
@@ -90,25 +93,25 @@ def run(plan, args):
 
 
 def launch_ssv_node(plan, config_artifact):
-    plan.add_service(
-        name  = "ssv-service",
-        config = ServiceConfig(
-            image = SSV_NODE_IMAGE,
-            cmd = ["/go/bin/ssvnode", "start-node", "--config", "/tmp/config.yml"],
-            ports = {
-                "tcp": PortSpec(number = 13001, transport_protocol = "TCP", wait = None),
-                "udp": PortSpec(number = 12001, transport_protocol = "UDP"),
-                "metrics": PortSpec(number = 15000, transport_protocol = "UDP"),
-            },
-            files = {
-                "/tmp": config_artifact
-            },
-            env_vars = {
-                "CONFIG_PATH": "/tmp/config.yml"
-            }
+    for index in range(0, NUM_SSV_NODES):
+        plan.add_service(
+            name  = "ssv-service-" + str(index),
+            config = ServiceConfig(
+                image = SSV_NODE_IMAGE,
+                cmd = ["/go/bin/ssvnode", "start-node", "--config", "/tmp/config.yml"],
+                ports = {
+                    "tcp": PortSpec(number = 13001, transport_protocol = "TCP", wait = None),
+                    "udp": PortSpec(number = 12001, transport_protocol = "UDP"),
+                    "metrics": PortSpec(number = 15000, transport_protocol = "UDP"),
+                },
+                files = {
+                    "/tmp": config_artifact
+                },
+                env_vars = {
+                    "CONFIG_PATH": "/tmp/config.yml"
+                }
+            )
         )
-    )
-
 
 
 def wait_until_node_reached_block(plan, node_id, target_block_number_int):
