@@ -13,10 +13,12 @@ MetricsAPIPort: 15000
 eth1:
   ETH1Addr: {{.ElNodeUrl}}
 
+bootnode:
+  ExternalIP: {{.FirstNodeIp}}
+  PrivateKey: "{{.SecretKey}}"
+
 ssv:
   GenesisEpoch:
   DutyLimit: 32
   ValidatorOptions:
     SignatureCollectionTimeout: 5s
-
-OperatorPrivateKey: "{{.SecretKey}}"

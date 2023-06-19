@@ -96,29 +96,17 @@ def launch_ssv_node(plan, beacon_url, el_url):
             "ElNodeUrl": el_url,
             "SecretKey": key["sk"]
         }
-        if index == 0 :
-            node_zero_config = plan.render_templates(
-                config = {
-                    "config.yml": struct(
-                        template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config0.yml.tmpl"),
-                        data = template_data
-                    )
-                }
-            )
-            files["/tmp"] = node_zero_config
-            cmd = ["/go/bin/ssvnode", "start-boot-node", "--config", "/tmp/config.yml"]
-        else:
-            template_data["FirstNodeIp"] = nodes[0].ip_address
-            config = plan.render_templates(
-                config = {
-                    "config.yml": struct(
-                        template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config.yml.tmpl"),
-                        data = template_data
-                    )
-                }
-            )
-            files["/tmp"] = config
-            cmd = ["/go/bin/ssvnode", "start-node", "--config", "/tmp/config.yml"]
+        # every node is a normal node
+        config = plan.render_templates(
+            config = {
+                "config.yml": struct(
+                    template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config.yml.tmpl"),
+                    data = template_data
+                )
+            }
+        )
+        files["/tmp"] = config
+        cmd = ["/go/bin/ssvnode", "start-node", "--config", "/tmp/config.yml"]
 
         node = plan.add_service(
             name  = "ssv-service-" + str(index),
