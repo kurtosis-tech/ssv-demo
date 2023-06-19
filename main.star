@@ -33,9 +33,15 @@ def run(plan, args):
     
     launch_ssv_node(plan, beacon_url, el_url)
 
-    # # spin up hardhat
+    # # spin up hardhat with right env variables
     hardhat_env_vars = {
-        "RPC_URI": el_url
+        "RPC_URI": el_url,
+        "MINIMUM_BLOCKS_BEFORE_LIQUIDATION":str(100800),
+        "MINIMUM_LIQUIDATION_COLLATERAL":str(200000000),
+        "OPERATOR_MAX_FEE_INCREASE":str(3),
+        "DECLARE_OPERATOR_FEE_PERIOD":str(259200),
+        "EXECUTE_OPERATOR_FEE_PERIOD":str(345600),
+        "VALIDATORS_PER_OPERATOR_LIMIT":str(500),
     }
 
     hardhat_project = "github.com/kurtosis-tech/ssv-demo/ssv-network"

@@ -1,7 +1,6 @@
 import { ethers, upgrades } from 'hardhat';
 
 async function deploy() {
-  const ssvTokenAddress = process.env.SSV_TOKEN_ADDRESS;
 
   const [deployer] = await ethers.getSigners();
   console.log(`Deploying contracts with the account:${deployer.address}`);
@@ -20,6 +19,14 @@ async function deploy() {
   const ssvOperatorsMod = await ssvOperatorsModFactory.deploy();
   await ssvOperatorsMod.deployed();
   console.log(`SSVOperators module deployed to: ${ssvOperatorsMod.address}`);
+
+
+  // Deploy mock ssv token - TODO gyani fix this
+  const ssvToken = await ethers.getContractFactory('SSVTokenMock');
+  let ssvTokenDeploy = await ssvToken.deploy();
+  await ssvTokenDeploy.deployed();
+
+  const ssvTokenAddress = ssvTokenDeploy.address;
 
 
   // Deploy ssvClustersMod
