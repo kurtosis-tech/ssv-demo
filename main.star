@@ -87,14 +87,14 @@ def run(plan, args):
 def launch_ssv_node(plan, beacon_url, el_url):
     nodes = []
     for index in range(0, NUM_SSV_NODES):
-        key = keys[index]
+        key = keys.key_pairs[index]
         files = {}
         cmd = []
         template_data = {
             "BeaconNodeAddr": beacon_url,
             "Network": NETWORK_NAME,
             "ElNodeUrl": el_url,
-            "SecretKey": keys["sk"]
+            "SecretKey": key["sk"]
         }
         if index == 0 :
             node_zero_config = plan.render_templates(
