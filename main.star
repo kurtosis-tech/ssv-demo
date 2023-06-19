@@ -7,6 +7,8 @@ SSV_NODE_IMAGE = "bloxstaking/ssv-node:latest"
 ACCOUNT_FROM_ETH = "ef5177cd0b6b21c87db5a0bf35d4084a8a57a9d6a064f86d51ac85f2b873a4e2"
 
 # allowed values are prater/pyrmont/mainnet
+# it matters at the moment; SSV will put "local"
+# FLUP from SSV @lior/mosher
 NETWORK_NAME = "prater"
 
 LATEST_BLOCK_NUMBER_GENERIC = "latest"
