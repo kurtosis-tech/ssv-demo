@@ -20,6 +20,10 @@ NUM_SSV_NODES = 4
 def run(plan, args):
     args["seconds_per_slot"] = 1
 
+    # Don't need the validator client
+    # you need beacon and execution and not validator (skip this!!)
+    # Run one light house and one prysm
+    # ex -run 4 operator nodes each with a different vallidator (prysm/lighthouse)
     participants, _ = eth_network_package.run(plan, args)
 
     plan.print(participants)
