@@ -5,14 +5,13 @@ import { expect } from 'chai';
 import { trackGas, GasGroup } from '../helpers/gas-usage';
 
 // Declare globals
-let ssvNetworkContract: any, registerAuth: any, minDepositAmount: any, firstCluster: any;
+let ssvNetworkContract: any, minDepositAmount: any, firstCluster: any;
 
 describe('Remove Validator Tests', () => {
   beforeEach(async () => {
     // Initialize contract
     const metadata = (await helpers.initializeContract());
     ssvNetworkContract = metadata.contract;
-    registerAuth = metadata.registerAuth;
 
     minDepositAmount = (helpers.CONFIG.minimalBlocksBeforeLiquidation + 10) * helpers.CONFIG.minimalOperatorFee * 4;
 
@@ -23,7 +22,7 @@ describe('Remove Validator Tests', () => {
     // cold register
     await helpers.coldRegisterValidator();
 
-    await registerAuth.setAuth(helpers.DB.owners[1].address, [false, true]);
+    await ssvNetworkContract.setRegisterAuth(helpers.DB.owners[1].address, [false, true]);
     // first validator
     await helpers.DB.ssvToken.connect(helpers.DB.owners[1]).approve(ssvNetworkContract.address, minDepositAmount);
     const register = await trackGas(ssvNetworkContract.connect(helpers.DB.owners[1]).registerValidator(
@@ -93,7 +92,7 @@ describe('Remove Validator Tests', () => {
       helpers.DataGenerator.shares(4),
       0,
       updatedCluster.cluster
-    ), [GasGroup.REGISTER_VALIDATOR_EXISTING_POD]);
+    ), [GasGroup.REGISTER_VALIDATOR_EXISTING_CLUSTER]);
     const afterRegisterCluster = newRegister.eventsByName.ValidatorAdded[0].args;
 
     // Remove the validator again
@@ -110,7 +109,7 @@ describe('Remove Validator Tests', () => {
       firstCluster.owner,
       firstCluster.operatorIds,
       firstCluster.cluster
-    ), [GasGroup.LIQUIDATE_POD]);
+    ), [GasGroup.LIQUIDATE_CLUSTER_4]);
     const updatedCluster = liquidatedCluster.eventsByName.ClusterLiquidated[0].args;
 
     await trackGas(ssvNetworkContract.connect(helpers.DB.owners[1]).removeValidator(
@@ -120,12 +119,20 @@ describe('Remove Validator Tests', () => {
     ), [GasGroup.REMOVE_VALIDATOR]);
   });
 
-  it('Remove validator with an invalid owner reverts "ValidatorOwnedByOtherAddress"', async () => {
-    await expect(ssvNetworkContract.connect(helpers.DB.owners[3]).removeValidator(
+  it('Remove validator with an invalid owner reverts "ValidatorDoesNotExist"', async () => {
+    await expect(ssvNetworkContract.connect(helpers.DB.owners[2]).removeValidator(
       helpers.DataGenerator.publicKey(1),
       firstCluster.operatorIds,
       firstCluster.cluster
-    )).to.be.revertedWithCustomError(ssvNetworkContract, 'ValidatorOwnedByOtherAddress');
+    )).to.be.revertedWithCustomError(ssvNetworkContract, 'ValidatorDoesNotExist');
+  });
+
+  it('Remove validator with an invalid operator setup reverts "IncorrectValidatorState"', async () => {
+    await expect(ssvNetworkContract.connect(helpers.DB.owners[1]).removeValidator(
+      helpers.DataGenerator.publicKey(1),
+      [1, 2, 3, 5],
+      firstCluster.cluster
+    )).to.be.revertedWithCustomError(ssvNetworkContract, 'IncorrectValidatorState');
   });
 
   it('Remove the same validator twice reverts "ValidatorDoesNotExist"', async () => {
