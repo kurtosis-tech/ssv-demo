@@ -3,10 +3,13 @@ async function upgradeSSVNetwork() {
   const [deployer] = await ethers.getSigners();
   console.log("Upgading contract with the account:", deployer.address);
 
-  const SSVNetwork = await ethers.getContractFactory("SSVNetwork_V2");
+  const SSVNetwork = await ethers.getContractFactory("SSVNetwork");
 
-  await upgrades.upgradeProxy(proxyAddress, SSVNetwork, { kind: 'uups' });
+  const ssvNetwork = await upgrades.upgradeProxy(proxyAddress, SSVNetwork, { kind: 'uups' });
   console.log("SSVNetwork upgraded successfully");
+
+  const implAddress = await upgrades.erc1967.getImplementationAddress(ssvNetwork.address);
+  console.log(`SSVNetwork implementation deployed to: ${implAddress}`);
 }
 
 upgradeSSVNetwork()

@@ -67,7 +67,7 @@ const config: HardhatUserConfig = {
         "17fdf89989597e8bcac6cdfcc001b6241c64cece2c358ffc818b72ca70f5e1ce",
       ],
       allowUnlimitedContractSize: true
-    },  
+    },
   },
   etherscan: {
     // Your API key for Etherscan
@@ -96,7 +96,8 @@ if (process.env.MAINNET_ETH_NODE_URL) {
   config.networks.mainnet = {
     url: process.env.MAINNET_ETH_NODE_URL,
     accounts: [`0x${process.env.MAINNET_OWNER_PRIVATE_KEY}`],
-    gasPrice: +(process.env.GAS_PRICE || '')
+    gasPrice: +(process.env.GAS_PRICE || ''),
+    gas: +(process.env.GAS || '')
   };
 }
 
