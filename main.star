@@ -1,5 +1,6 @@
 eth_network_package = import_module("github.com/kurtosis-tech/eth-network-package/main.star")
 hardhat_module = import_module("github.com/kurtosis-tech/web3-tools/hardhat.star")
+keys = import_module("github.com/kurtosis-tech/ssv-demo/keys.star")
 
 SSV_NODE_IMAGE = "bloxstaking/ssv-node:latest"
 
@@ -84,40 +85,28 @@ def run(plan, args):
 
 
 def launch_ssv_node(plan, beacon_url, el_url):
-    template_data = {
-        "BeaconNodeAddr": beacon_url,
-        "Network": NETWORK_NAME,
-        "ElNodeUrl": el_url,
-    }
-
-
-    node_zero_config = plan.render_templates(
-        config = {
-            "config.yml": struct(
-                template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config0.yml.tmpl"),
-                data = template_data
-            )
-        }
-    )
     nodes = []
     for index in range(0, NUM_SSV_NODES):
+        key = keys.key_pairs[index]
         files = {}
         cmd = []
-        if index == 0 :
-            files["/tmp"] = node_zero_config
-            cmd = ["/go/bin/ssvnode", "start-boot-node", "--config", "/tmp/config.yml"]
-        else:
-            template_data["FirstNodeIp"] = nodes[0].ip_address
-            config = plan.render_templates(
-                config = {
-                    "config.yml": struct(
-                        template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config.yml.tmpl"),
-                        data = template_data
-                    )
-                }
-            )
-            files["/tmp"] = config
-            cmd = ["/go/bin/ssvnode", "start-node", "--config", "/tmp/config.yml"]
+        template_data = {
+            "BeaconNodeAddr": beacon_url,
+            "Network": NETWORK_NAME,
+            "ElNodeUrl": el_url,
+            "SecretKey": key["sk"]
+        }
+        # every node is a normal node
+        config = plan.render_templates(
+            config = {
+                "config.yml": struct(
+                    template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config.yml.tmpl"),
+                    data = template_data
+                )
+            }
+        )
+        files["/tmp"] = config
+        cmd = ["/go/bin/ssvnode", "start-node", "--config", "/tmp/config.yml"]
 
         node = plan.add_service(
             name  = "ssv-service-" + str(index),
