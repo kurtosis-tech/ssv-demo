@@ -32,8 +32,6 @@ def run(plan, args):
     beacon_node_port = participants[0].cl_client_context.http_port_num
     beacon_url = "http://{0}:{1}".format(beacon_node_addr, beacon_node_port)
     
-    launch_ssv_node(plan, beacon_url, el_url)
-
     # # spin up hardhat with right env variables
     hardhat_env_vars = {
         "RPC_URI": el_url,
@@ -83,8 +81,10 @@ def run(plan, args):
 
     hardhat_module.run(plan, "scripts/deploy-all.ts", "localnet")
 
+    launch_ssv_nodes(plan, beacon_url, el_url)
 
-def launch_ssv_node(plan, beacon_url, el_url):
+
+def launch_ssv_nodes(plan, beacon_url, el_url):
     nodes = []
     for index in range(0, NUM_SSV_NODES):
         key = keys.key_pairs[index]
