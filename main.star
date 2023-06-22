@@ -100,7 +100,9 @@ def launch_ssv_nodes(plan, beacon_url, el_url):
             "BeaconNodeAddr": beacon_url,
             "Network": NETWORK_NAME,
             "ElNodeUrl": el_url,
-            "SecretKey": key["sk"]
+            "SecretKey": key["sk"],
+            # this comes from SSVNetwork proxy deployed to: 0x776137553470cBf7a4EB1e30bb201e4931A26a49
+            "RegistryContractAddr": "0x776137553470cBf7a4EB1e30bb201e4931A26a49"
         }
         # every node is a normal node
         config = plan.render_templates(
