@@ -41,6 +41,14 @@ def run(plan, args):
     # # spin up hardhat with right env variables
     hardhat_env_vars = {
         "RPC_URI": el_url,
+        # TODO figure out if this makes sense with Andrew
+        "BATCH_INDEX": str(1),
+        "GAS_PRICE": str(0),
+        "GAS_LIMIT": str(0),
+        "SSV_NETWORK_ADDRESS_STAGE": "0x776137553470cBf7a4EB1e30bb201e4931A26a49",
+        "SSV_TOKEN_ADDRESS": "0x4c849Ff66a6F0A954cbf7818b8a763105C2787D6",
+        "KEYSTORE_PASSWORD": "password",
+        # End of New Variables
         "MINIMUM_BLOCKS_BEFORE_LIQUIDATION":str(100800),
         "MINIMUM_LIQUIDATION_COLLATERAL":str(200000000),
         "OPERATOR_MAX_FEE_INCREASE":str(3),
@@ -102,6 +110,7 @@ def launch_ssv_nodes(plan, beacon_url, el_url):
             "ElNodeUrl": el_url,
             "SecretKey": key["sk"],
             # this comes from SSVNetwork proxy deployed to: 0x776137553470cBf7a4EB1e30bb201e4931A26a49
+            # TODO remove the hardcodings
             "RegistryContractAddr": "0x776137553470cBf7a4EB1e30bb201e4931A26a49"
         }
         # every node is a normal node

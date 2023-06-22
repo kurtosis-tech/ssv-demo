@@ -3,13 +3,11 @@ const operatorBatches = require('../data/newOperators.json')
 const accountsJSON = require('../data/accountDataStage.json')
 const hre = require("hardhat");
 const { ethers } = hre;
-import * as dotenv from 'dotenv'
-dotenv.config({ path: '../.env' })
 
 let registeredOperators = 1
 
 // Build provider on the Goerli network
-const provider = ethers.getDefaultProvider(process.env.ETH1_URL)
+const provider = ethers.getDefaultProvider(process.env.RPC_URI)
 
 // Build wallets from the private keys
 let accounts = accountsJSON.operators.map(account => new ethers.Wallet(account.privateKey, provider))
