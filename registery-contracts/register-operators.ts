@@ -1,6 +1,6 @@
 // Define imports
-const operatorBatches = require('../data/newOperators.json')
-const accountsJSON = require('../data/accountDataStage.json')
+const operatorBatches = require('./newOperators.json')
+const accountsJSON = require('./accountData.json')
 const hre = require("hardhat");
 const { ethers } = hre;
 
