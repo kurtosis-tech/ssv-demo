@@ -98,7 +98,7 @@ def run(plan, args):
     launch_ssv_nodes(plan, beacon_url, el_url)
 
 
-    registry_contracts = plan.uplad("github.com/kurtosis-tech/ssv-demo/registry-contracts")
+    registry_contracts = plan.upload_files("github.com/kurtosis-tech/ssv-demo/registery-contracts")
     plan.add_service(
         name = "registry-contract",
         config = ServiceConfig(
@@ -115,16 +115,38 @@ def run(plan, args):
             }
         )
     )
+
     plan.exec(
-        name = "registery-contracts",
+        service_name = "registry-contract",
         recipe = ExecRecipe(
-            command = ["cd /tmp/hardhat && yarn install"]
+            command = ["/bin/sh", "-c", "apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python"]
+        )
+    )
+
+    plan.exec(
+        service_name = "registry-contract",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "apk add --update --no-cache git"]
+        )
+    )
+
+    plan.exec(
+        service_name = "registry-contract",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "apk add --update --no-cache make"]
+        )
+    )
+
+    plan.exec(
+        service_name = "registry-contract",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cd /tmp/hardhat && yarn install"]
         )
     )
     plan.exec(
-        name = "registery-contracts",
+        service_name = "registry-contract",
         recipe = ExecRecipe(
-            command = ["cd /tmp/hardhat && npx ts-node register-operators.ts"]
+            command = ["/bin/sh", "-c", "cd /tmp/hardhat && npx ts-node register-operators.ts"]
         )
     )
 
