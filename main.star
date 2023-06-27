@@ -98,6 +98,37 @@ def run(plan, args):
     launch_ssv_nodes(plan, beacon_url, el_url)
 
 
+    registry_contracts = plan.uplad("github.com/kurtosis-tech/ssv-demo/registry-contracts")
+    plan.add_service(
+        name = "registry-contract",
+        config = ServiceConfig(
+            image = "node:14.21.3-alpine",
+            entrypoint = ["tail", "-f", "/dev/null"],
+            files = {
+                "/tmp/hardhat": registry
+            },
+            env_vars = {
+                "RPC_URI": el_url,
+                "SSV_NETWORK_ADDRESS_STAGE": "0x776137553470cBf7a4EB1e30bb201e4931A26a49",
+                "GAS_PRICE": str(0),
+                "GAS_LIMIT": str(0),
+            }
+        )
+    )
+    plan.exec(
+        name = "registery-contracts",
+        recipe = ExecRecipe(
+            command = ["cd /tmp/hardhat && yarn install"]
+        )
+    )
+    plan.exec(
+        name = "registery-contracts",
+        recipe = ExecRecipe(
+            command = ["cd /tmp/hardhat && npx ts-node register-operators.ts"]
+        )
+    )
+
+
 def launch_ssv_nodes(plan, beacon_url, el_url):
     nodes = []
     for index in range(0, NUM_SSV_NODES):
