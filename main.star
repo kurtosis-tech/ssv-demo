@@ -26,9 +26,6 @@ def run(plan, args):
     # you need beacon and execution and not validator (skip this!!)
     # Run one light house and one prysm
     # ex -run 4 operator nodes each with a different vallidator (prysm/lighthouse)
-    args["network_params"] = {
-        "num_validator_keys_per_node": 1
-    }
     participants, _ = eth_network_package.run(plan, args)
 
     plan.print(participants)
