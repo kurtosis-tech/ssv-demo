@@ -140,7 +140,7 @@ def run(plan, args):
     plan.exec(
         service_name = "registry-contract",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "cd /tmp/hardhat && yarn install"]
+            command = ["/bin/sh", "-c", "cd /tmp/hardhat && yarn install || 0"]
         )
     )
     plan.exec(
