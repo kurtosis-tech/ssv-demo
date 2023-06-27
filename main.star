@@ -105,7 +105,7 @@ def run(plan, args):
             image = "node:14.21.3-alpine",
             entrypoint = ["tail", "-f", "/dev/null"],
             files = {
-                "/tmp/hardhat": registry
+                "/tmp/hardhat": registry_contracts,
             },
             env_vars = {
                 "RPC_URI": el_url,
