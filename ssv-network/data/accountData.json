@@ -1,0 +1,16 @@
+{
+    "operators": [
+      {
+        "name": "Operator Account 1",
+        "publicKey": "LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tCk1JSUJJakFOQmdrcWhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBdEhocEhUOTlLdFlCNUZUNUFKRlQKQ294SWF2eWlkTDNCTDBBeGJZTTNOYkRkNWFYZTB2UzUzY3MvZEU5cVcyN0s1N0ZqczhUeVNQcCtHQk40ZmlVUApZcHFEekJzQkhFUHdJekFkc2NMYmtOcDlvY05jaXJiQzZEM3hQYnAzZG05dWEvVGRUSTJqc0pRUHp5TzBQNW5aCnRBVHN3a2xKMFVMZkowTmNUWlljZjhRREdNcDJXVDZTQ216Q1ZJemg2dDExNzhkdC9TaEZ5dFF0bVBNeGVKNzQKdmxHZWhhMi9GeUxuenhMT055SlY3ZUxJemR0SE1qcGhTVHplYUJSZ1M5R0tUcGNzQXo0amRjMUVud2RpeGNOOAplaEo1MGdGbU02a0x2R3lEUFBDbEZtMFpsajhLMkZZNVhWWERsUVY2UVlpaTRCOWc4S3RBR0o3dHlucTZNaUZ6CnhRSURBUUFCCi0tLS0tRU5EIFJTQSBQVUJMSUMgS0VZLS0tLS0K",
+        "privateKey": "48fcc39ae27a0e8bf0274021ae6ebd8fe4a0e12623d61464c498900b28feb567"
+      },
+    ],
+    "validators": [
+      {
+        "name": "Validator Account 1",
+        "publicKey": "account public key",
+        "privateKey": "account private key"
+      },
+    ]
+  }
