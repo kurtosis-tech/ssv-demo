@@ -1,0 +1,26 @@
+{
+    "operators": [
+      {
+        "name": "Operator Account 1",
+        "publicKey": "account public key",
+        "privateKey": "account private key"
+      },
+      {
+        "name": "Operator Account 2",
+        "publicKey": "account public key",
+        "privateKey": "account private key"
+      }
+    ],
+    "validators": [
+      {
+        "name": "Validator Account 1",
+        "publicKey": "account public key",
+        "privateKey": "account private key"
+      },
+      {
+        "name": "Validator Account 2",
+        "publicKey": "account public key",
+        "privateKey": "account private key"
+      }
+    ]
+  }
