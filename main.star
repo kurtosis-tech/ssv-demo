@@ -20,8 +20,6 @@ JQ_PAD_HEX_FILTER = """{} | ascii_upcase | split("") | map({{"x": 0, "0": 0, "1"
 NUM_SSV_NODES = 4
 
 def run(plan, args):
-    args["seconds_per_slot"] = 1
-
     # Don't need the validator client
     # you need beacon and execution and not validator (skip this!!)
     # Run one light house and one prysm
