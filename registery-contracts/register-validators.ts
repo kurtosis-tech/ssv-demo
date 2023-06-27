@@ -1,8 +1,8 @@
 // Define imports
 import { ClusterScanner, NonceScanner } from 'ssv-scanner';
 import { SSVKeys, KeyShares } from 'ssv-keys';
-const operatorBatches = require('../data/operatorBatchesStage.json')
-const accountsJSON = require('../data/accountDataStage.json')
+const operatorBatches = require('./operatorBatches.json')
+const accountsJSON = require('./accountData.json')
 const fs = require('fs')
 const hre = require("hardhat");
 const { ethers } = hre;
@@ -22,8 +22,8 @@ let accounts = accountsJSON.validators.map(account => new ethers.Wallet(account.
 
 // Define cluster param type
 type clusterParams = {
-    nodeUrl: any;
-    contractAddress: any;
+    nodeUrl: string;
+    contractAddress: string;
     ownerAddress: string;
     operatorIds: number[];
 };
@@ -31,8 +31,8 @@ type clusterParams = {
 // Perform the cluster and nonce scanner functionality
 async function getClusterAndNonce() {
     const params: clusterParams = {
-        nodeUrl: process.env.RPC_URI,
-        contractAddress: process.env.SSV_NETWORK_ADDRESS_STAGE,
+        nodeUrl: process.env.RPC_URI || '127.0.0.1:8545',
+        contractAddress: process.env.SSV_NETWORK_ADDRESS_STAGE || 'INVALID',
         ownerAddress: accounts[batchCount].address,
         operatorIds: operatorBatches.IDs[batchCount],
     }
@@ -95,7 +95,7 @@ async function registerValidators() {
         while (shares.length !== sharesExpectedLength) {
             // Step 1: read keystore file
             const ssvKeys = new SSVKeys();
-            const { publicKey, privateKey } = await ssvKeys.extractKeys(keystoreData, process.env.KEYSTORE_PASSWORD);
+            const { publicKey, privateKey } = await ssvKeys.extractKeys(keystoreData, process.env.KEYSTORE_PASSWORD!);
             const operators = operatorBatches.publicKeys[batchCount].map((operatorPublicKeys: string, index: number) => ({
                 id: operatorBatches.IDs[batchCount][index],
                 publicKey: operatorPublicKeys
