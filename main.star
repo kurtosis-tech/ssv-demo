@@ -41,8 +41,8 @@ def run(plan, args):
         "RPC_URI": el_url,
         # TODO figure out if this makes sense with Andrew
         "BATCH_INDEX": str(1),
-        "GAS_PRICE": str(3000000),
-        "GAS_LIMIT": str(30000000),
+        "GAS_PRICE": str(300000),
+        "GAS_LIMIT": str(3000000),
         "SSV_NETWORK_ADDRESS_STAGE": "0x776137553470cBf7a4EB1e30bb201e4931A26a49",
         "SSV_TOKEN_ADDRESS": "0x4c849Ff66a6F0A954cbf7818b8a763105C2787D6",
         "KEYSTORE_PASSWORD": "password",
