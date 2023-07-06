@@ -87,14 +87,14 @@ def run(plan, args):
     plan.exec(
         service_name = "hardhat",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "cd /tmp/hardhat && yarn install ssv-keys"]
+            command = ["/bin/sh", "-c", "cd /tmp/hardhat && yarn add ssv-keys"]
         )
     )
 
     plan.exec(
         service_name = "hardhat",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "cd /tmp/hardhat && yarn install bloxapp/ssv-scanner"]
+            command = ["/bin/sh", "-c", "cd /tmp/hardhat && yarn add bloxapp/ssv-scanner"]
         )
     )    
 
