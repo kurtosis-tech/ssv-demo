@@ -64,9 +64,10 @@ async function registerValidators() {
             gasLimit: process.env.GAS_LIMIT
         }
     )
-    console.log(`Successfully Approved ${accountsJSON.validators[batchCount].name}`)
+    console.log("waiting for approval tx to go through")
     await approveTX.wait()
-
+    console.log(`Successfully Approved ${accountsJSON.validators[batchCount].name}`)
+    
     // Scan the cluster
     let data = await getClusterAndNonce()
     let nonce = data.nonce
