@@ -61,6 +61,7 @@ def run(plan, args):
     }
 
     hardhat_project = "github.com/kurtosis-tech/ssv-demo/ssv-network"
+    # secret keys need to be uploaded
     hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars, {"/tmp/validator-keys/": validator_keys})
 
     plan.exec(
