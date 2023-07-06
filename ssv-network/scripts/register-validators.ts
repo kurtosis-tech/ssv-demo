@@ -12,7 +12,7 @@ let successCount = 0
 let failureCount = 0
 const sharesExpectedLength = 2626
 const batchCount: any = process.env.BATCH_INDEX
-const keystorePath = `/Users/andrew/Documents/keystores/JatoStage/ToRegister${batchCount}/`
+const keystorePath = `/tmp/validators/`
 
 // Build provider on the Goerli network
 const provider = ethers.getDefaultProvider(process.env.RPC_URI)

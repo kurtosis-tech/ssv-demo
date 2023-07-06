@@ -39,8 +39,7 @@ def run(plan, args):
     # # spin up hardhat with right env variables
     hardhat_env_vars = {
         "RPC_URI": el_url,
-        # TODO figure out if this makes sense with Andrew
-        "BATCH_INDEX": str(1),
+        "BATCH_INDEX": str(0),
         "GAS_PRICE": str(900000),
         "GAS_LIMIT": str(4000000),
         "SSV_NETWORK_ADDRESS_STAGE": "0x776137553470cBf7a4EB1e30bb201e4931A26a49",
