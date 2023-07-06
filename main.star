@@ -116,7 +116,7 @@ def run(plan, args):
 
     hardhat_module.run(plan, "scripts/register-operators.ts", "localnet")
     # TODO run this by default
-    # hardhat_module.run(plan, "scripts/register-validators.ts", "localnet")
+    hardhat_module.run(plan, "scripts/register-validators.ts", "localnet")
     
 
 
