@@ -39,6 +39,7 @@ def run(plan, args):
     # TODO productize this bit - for now it knows about the name of the validator and how keys are stored; it shoudln't
     validator_service_name = "cl-client-0-validator"
     validator_keys = plan.store_service_files(service_name=validator_service_name, src="/validator-keys/node-0-keystores/teku-keys/")
+    validator_secrets = plan.store_service_files(service_name=validator_service_name, src="/validator-keys/node-0-keystores/teku-secrets/")
     
     # # spin up hardhat with right env variables
     hardhat_env_vars = {
@@ -51,7 +52,6 @@ def run(plan, args):
         "SSV_TOKEN_ADDRESS": "0x4c849Ff66a6F0A954cbf7818b8a763105C2787D6",
         "SSV_TOKEN_APPROVE_AMOUNT": str(1000000000000000),
         "TOKEN_AMOUNT": str(1000000000000000),
-        "KEYSTORE_PASSWORD": "password",
         # End of New Variables
         "MINIMUM_BLOCKS_BEFORE_LIQUIDATION":str(100800),
         "MINIMUM_LIQUIDATION_COLLATERAL":str(200000000),
@@ -63,7 +63,7 @@ def run(plan, args):
 
     hardhat_project = "github.com/kurtosis-tech/ssv-demo/ssv-network"
     # secret keys need to be uploaded
-    hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars, {"/tmp/validator-keys/": validator_keys})
+    hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars, {"/tmp/validator-keys/": validator_keys, "/tmp/validator-secrets/": validator_secrets})
 
     plan.exec(
         service_name = "hardhat",

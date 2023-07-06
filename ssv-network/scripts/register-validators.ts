@@ -14,6 +14,7 @@ const sharesExpectedLength = 2626
 const batchCount: any = process.env.BATCH_INDEX
 const validatorsToRegister: any = process.env.VALIDATORS_TO_REGISTER
 const keystorePath = `/tmp/validator-keys/teku-keys/`
+const secretsPath = `/tmp/validator-keys/teku-secrets/`
 
 // Build provider on the Goerli network
 const provider = ethers.getDefaultProvider(process.env.RPC_URI)
@@ -92,6 +93,8 @@ async function registerValidators() {
 
         // Build the keystore path
         const keystoreData = require(keystorePath + keystoreFile.name)
+        const passwordFileName = keystoreFile.name.replace(".json", ".txt")
+        const password = fs.readFileSync(passwordFileName, 'utf-8');
 
         // Build the shares
         while (shares.length !== sharesExpectedLength) {
@@ -100,9 +103,11 @@ async function registerValidators() {
                 break
             }
 
+
+
             // Step 1: read keystore file
             const ssvKeys = new SSVKeys();
-            const { publicKey, privateKey } = await ssvKeys.extractKeys(keystoreData, process.env.KEYSTORE_PASSWORD!);
+            const { publicKey, privateKey } = await ssvKeys.extractKeys(keystoreData, password);
             const operators = operatorBatches.publicKeys[batchCount].map((operatorPublicKeys: string, index: number) => ({
                 id: operatorBatches.IDs[batchCount][index],
                 operatorKey: operatorPublicKeys
