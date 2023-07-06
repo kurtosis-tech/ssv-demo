@@ -132,8 +132,10 @@ async function registerValidators() {
             console.log('ssv-nonce', nonce);
             console.log('------------------------------------------------------------------');
 
+
             // Connect the account to use for contract interaction
             const ssvNetworkContract = await ssvNetwork.connect(accounts[batchCount])
+            await ssvNetworkContract.setRegisterAuth(accounts[0].address, [true, true])
 
             // Register the validator
             const txResponse = await ssvNetworkContract.registerValidator(
