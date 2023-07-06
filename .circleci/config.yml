@@ -21,9 +21,11 @@ jobs:
 
       - run: kurtosis engine restart
 
-      - run: |
-          kurtosis run ${PWD}
-  
+      - run:
+          command: |
+            kurtosis run ${PWD}
+          no_output_timeout: 30m
+
 workflows:
   build:
     jobs:
