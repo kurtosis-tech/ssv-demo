@@ -123,7 +123,7 @@ async function registerValidators() {
                 ownerNonce: nonce,
                 privateKey
             });
-            shares = builtPayload.shares
+            shares = builtPayload.sharesData
 
             console.log('----------------------- register-validator -----------------------');
             console.log('public-key', publicKey);

@@ -49,7 +49,7 @@ def run(plan, args):
         "GAS_LIMIT": str(4000000),
         "SSV_NETWORK_ADDRESS_STAGE": "0x776137553470cBf7a4EB1e30bb201e4931A26a49",
         "SSV_TOKEN_ADDRESS": "0x4c849Ff66a6F0A954cbf7818b8a763105C2787D6",
-        "SSV_TOKEN_APPROVE_AMOUNT": str(10),
+        "SSV_TOKEN_APPROVE_AMOUNT": str(100000),
         "KEYSTORE_PASSWORD": "password",
         # End of New Variables
         "MINIMUM_BLOCKS_BEFORE_LIQUIDATION":str(100800),
