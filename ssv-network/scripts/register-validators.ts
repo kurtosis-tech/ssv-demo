@@ -14,7 +14,7 @@ const sharesExpectedLength = 2626
 const batchCount: any = process.env.BATCH_INDEX
 const validatorsToRegister: any = process.env.VALIDATORS_TO_REGISTER
 const keystorePath = `/tmp/validator-keys/teku-keys/`
-const secretsPath = `/tmp/validator-keys/teku-secrets/`
+const secretsPath = `/tmp/validator-secrets/teku-secrets/`
 
 // Build provider on the Goerli network
 const provider = ethers.getDefaultProvider(process.env.RPC_URI)
@@ -82,7 +82,11 @@ async function registerValidators() {
     let keystoreLength = await fs.promises.readdir(keystorePath)
 
     // Loop through all the keystores and build their payloads
+    let index = 0;
     for await (const keystoreFile of dir) {
+        if (index >= validatorsToRegister) {
+            break
+        }
         if (keystoreFile.name === '.DS_Store' || !keystoreFile.name.includes('.json')) {
             keystoreLength--
             continue
@@ -94,7 +98,7 @@ async function registerValidators() {
         // Build the keystore path
         const keystoreData = require(keystorePath + keystoreFile.name)
         const passwordFileName = keystoreFile.name.replace(".json", ".txt")
-        const password = fs.readFileSync(passwordFileName, 'utf-8');
+        const password = fs.readFileSync(secretsPath + passwordFileName, 'utf-8');
 
         // Build the shares
         while (shares.length !== sharesExpectedLength) {
@@ -173,6 +177,7 @@ async function registerValidators() {
                 // TODO - handle failed tx
             }
         }
+        index+=1
     }
     // TODO - build and save a json output of all results
 }

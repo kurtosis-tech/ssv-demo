@@ -39,7 +39,7 @@ async function registerOperators() {
         // Register the validator
         const txResponse = await ssvNetworkContract.registerOperator(
             abiEncoded,
-            '956600000000',
+            '100000000',
             {
                 gasPrice: process.env.GAS_PRICE,
                 gasLimit: process.env.GAS_LIMIT

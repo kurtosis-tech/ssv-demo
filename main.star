@@ -45,7 +45,7 @@ def run(plan, args):
     hardhat_env_vars = {
         "RPC_URI": el_url,
         "BATCH_INDEX": str(0),
-        "VALIDATORS_TO_REGISTER": str(10),
+        "VALIDATORS_TO_REGISTER": str(1),
         "GAS_PRICE": str(900000),
         "GAS_LIMIT": str(4000000),
         "SSV_NETWORK_ADDRESS_STAGE": "0x776137553470cBf7a4EB1e30bb201e4931A26a49",
