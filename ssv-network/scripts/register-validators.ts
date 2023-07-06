@@ -12,7 +12,8 @@ let successCount = 0
 let failureCount = 0
 const sharesExpectedLength = 2626
 const batchCount: any = process.env.BATCH_INDEX
-const keystorePath = `/tmp/validators/`
+const validatorsToRegister: any = process.env.VALIDATORS_TO_REGISTER
+const keystorePath = `/tmp/validator-keys/`
 
 // Build provider on the Goerli network
 const provider = ethers.getDefaultProvider(process.env.RPC_URI)
@@ -93,6 +94,11 @@ async function registerValidators() {
 
         // Build the shares
         while (shares.length !== sharesExpectedLength) {
+            // We only attempt VALIDATORS_TO_REGISTER number of registrations
+            if (successCount + failureCount >= validatorsToRegister) {
+                break
+            }
+
             // Step 1: read keystore file
             const ssvKeys = new SSVKeys();
             const { publicKey, privateKey } = await ssvKeys.extractKeys(keystoreData, process.env.KEYSTORE_PASSWORD!);

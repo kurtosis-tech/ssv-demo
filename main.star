@@ -35,11 +35,16 @@ def run(plan, args):
     beacon_node_addr = participants[0].cl_client_context.ip_addr
     beacon_node_port = participants[0].cl_client_context.http_port_num
     beacon_url = "http://{0}:{1}".format(beacon_node_addr, beacon_node_port)
+
+    # TODO productize this bit - for now it knows about the name of the validator and how keys are stored; it shoudln't
+    validator_service_name = "cl-client-0-validator"
+    validator_keys = plan.upload_files("/validator-keys/node-0-keystores/teku-keys/", validator_service_name")
     
     # # spin up hardhat with right env variables
     hardhat_env_vars = {
         "RPC_URI": el_url,
         "BATCH_INDEX": str(0),
+        "VALIDATORS_TO_REGISTER": str(10),
         "GAS_PRICE": str(900000),
         "GAS_LIMIT": str(4000000),
         "SSV_NETWORK_ADDRESS_STAGE": "0x776137553470cBf7a4EB1e30bb201e4931A26a49",
@@ -55,7 +60,7 @@ def run(plan, args):
     }
 
     hardhat_project = "github.com/kurtosis-tech/ssv-demo/ssv-network"
-    hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars)
+    hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars, {"/tmp/validator-keys/": validator_keys})
 
     plan.exec(
         service_name = "hardhat",
@@ -95,6 +100,8 @@ def run(plan, args):
     launch_ssv_nodes(plan, beacon_url, el_url)
 
     hardhat_module.run(plan, "scripts/register-operators.ts", "localnet")
+    # TODO run this by default
+    # hardhat_module.run(plan, "scripts/register-validators.ts", "localnet")
     
 
 
