@@ -95,7 +95,7 @@ def run(plan, args):
 
     launch_ssv_nodes(plan, beacon_url, el_url)
 
-    # hardhat_module.run(plan, "scripts/register-operators.ts", "localnet")
+    hardhat_module.run(plan, "scripts/register-operators.ts", "localnet")
     
 
 
