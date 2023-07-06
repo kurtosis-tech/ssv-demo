@@ -12,12 +12,16 @@ MetricsAPIPort: 15000
 
 eth1:
   ETH1Addr: {{.ElNodeUrl}}
+  RegistryContractAddr: "{{.RegistryContractAddr}}"
 
 ssv:
-  GenesisEpoch:
+  GenesisEpoch: 0
   DutyLimit: 32
   ValidatorOptions:
     SignatureCollectionTimeout: 5s
 
 
 OperatorPrivateKey: "{{.SecretKey}}"
+
+p2p:
+  Discovery: mdns

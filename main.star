@@ -7,6 +7,8 @@ SSV_NODE_IMAGE = "bloxstaking/ssv-node:latest"
 ACCOUNT_FROM_ETH = "ef5177cd0b6b21c87db5a0bf35d4084a8a57a9d6a064f86d51ac85f2b873a4e2"
 
 # allowed values are prater/pyrmont/mainnet
+# it matters at the moment; SSV will put "local"
+# FLUP from SSV @lior/mosher
 NETWORK_NAME = "prater"
 
 LATEST_BLOCK_NUMBER_GENERIC = "latest"
@@ -18,8 +20,10 @@ JQ_PAD_HEX_FILTER = """{} | ascii_upcase | split("") | map({{"x": 0, "0": 0, "1"
 NUM_SSV_NODES = 4
 
 def run(plan, args):
-    args["seconds_per_slot"] = 1
-
+    # Don't need the validator client
+    # you need beacon and execution and not validator (skip this!!)
+    # Run one light house and one prysm
+    # ex -run 4 operator nodes each with a different vallidator (prysm/lighthouse)
     participants, _ = eth_network_package.run(plan, args)
 
     plan.print(participants)
@@ -31,12 +35,24 @@ def run(plan, args):
     beacon_node_addr = participants[0].cl_client_context.ip_addr
     beacon_node_port = participants[0].cl_client_context.http_port_num
     beacon_url = "http://{0}:{1}".format(beacon_node_addr, beacon_node_port)
-    
-    launch_ssv_node(plan, beacon_url, el_url)
 
+    # TODO productize this bit - for now it knows about the name of the validator and how keys are stored; it shoudln't
+    validator_service_name = "cl-client-0-validator"
+    validator_keys = plan.store_service_files(service_name=validator_service_name, src="/validator-keys/node-0-keystores/teku-keys/")
+    validator_secrets = plan.store_service_files(service_name=validator_service_name, src="/validator-keys/node-0-keystores/teku-secrets/")
+    
     # # spin up hardhat with right env variables
     hardhat_env_vars = {
         "RPC_URI": el_url,
+        "BATCH_INDEX": str(0),
+        "VALIDATORS_TO_REGISTER": str(1),
+        "GAS_PRICE": str(900000),
+        "GAS_LIMIT": str(4000000),
+        "SSV_NETWORK_ADDRESS_STAGE": "0x776137553470cBf7a4EB1e30bb201e4931A26a49",
+        "SSV_TOKEN_ADDRESS": "0x4c849Ff66a6F0A954cbf7818b8a763105C2787D6",
+        "SSV_TOKEN_APPROVE_AMOUNT": str(1000000000000000),
+        "TOKEN_AMOUNT": str(1000000000000000),
+        # End of New Variables
         "MINIMUM_BLOCKS_BEFORE_LIQUIDATION":str(100800),
         "MINIMUM_LIQUIDATION_COLLATERAL":str(200000000),
         "OPERATOR_MAX_FEE_INCREASE":str(3),
@@ -46,7 +62,8 @@ def run(plan, args):
     }
 
     hardhat_project = "github.com/kurtosis-tech/ssv-demo/ssv-network"
-    hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars)
+    # secret keys need to be uploaded
+    hardhat = hardhat_module.init(plan, hardhat_project, hardhat_env_vars, {"/tmp/validator-keys/": validator_keys, "/tmp/validator-secrets/": validator_secrets})
 
     plan.exec(
         service_name = "hardhat",
@@ -58,6 +75,20 @@ def run(plan, args):
     plan.exec(
         service_name = "hardhat",
         recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "apk add git"]
+        )
+    )
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "apk add make g++ py3-pip"]
+        )
+    )
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
             command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm install"]
         )
     )
@@ -65,7 +96,7 @@ def run(plan, args):
     plan.exec(
         service_name = "hardhat",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", 'cd /tmp/hardhat && npm install --save-dev "@nomicfoundation/hardhat-network-helpers@^1.0.0" "@nomicfoundation/hardhat-chai-matchers@^1.0.0" "@nomiclabs/hardhat-etherscan@^3.0.0" "@typechain/ethers-v5@^10.1.0" "@typechain/hardhat@^6.1.2" "chai@^4.2.0" "hardhat-gas-reporter@^1.0.8" "solidity-coverage@^0.8.1" "typechain@^8.1.0"']
+            command = ["/bin/sh", "-c", 'cd /tmp/hardhat && npm install --save-dev "@nomicfoundation/hardhat-network-helpers@^1.0.0" "@nomicfoundation/hardhat-chai-matchers@^1.0.0" "@nomiclabs/hardhat-etherscan@^3.0.0" "@typechain/ethers-v5@^10.1.0" "@typechain/hardhat@^6.1.2" "chai@^4.2.0" "hardhat-gas-reporter@^1.0.8" "solidity-coverage@^0.8.1" "typechain@^8.1.0" "ssv-keys@^1.0.1" "bloxapp/ssv-scanner"']
         )
     )
 
@@ -74,7 +105,7 @@ def run(plan, args):
         recipe = ExecRecipe(
             command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm install"]
         )
-    )
+    )   
     
     hardhat_module.compile(plan)
 
@@ -83,8 +114,14 @@ def run(plan, args):
 
     hardhat_module.run(plan, "scripts/deploy-all.ts", "localnet")
 
+    hardhat_module.run(plan, "scripts/register-operators.ts", "localnet")
+    # TODO run this by default
+    hardhat_module.run(plan, "scripts/register-validators.ts", "localnet")
+    # npx hardhat run scripts/register-validators.ts --network localnet
 
-def launch_ssv_node(plan, beacon_url, el_url):
+    launch_ssv_nodes(plan, beacon_url, el_url)
+
+def launch_ssv_nodes(plan, beacon_url, el_url):
     nodes = []
     for index in range(0, NUM_SSV_NODES):
         key = keys.key_pairs[index]
@@ -94,7 +131,10 @@ def launch_ssv_node(plan, beacon_url, el_url):
             "BeaconNodeAddr": beacon_url,
             "Network": NETWORK_NAME,
             "ElNodeUrl": el_url,
-            "SecretKey": key["sk"]
+            "SecretKey": key["sk"],
+            # this comes from SSVNetwork proxy deployed to: 0x776137553470cBf7a4EB1e30bb201e4931A26a49
+            # TODO remove the hardcodings
+            "RegistryContractAddr": "0x776137553470cBf7a4EB1e30bb201e4931A26a49"
         }
         # every node is a normal node
         config = plan.render_templates(
