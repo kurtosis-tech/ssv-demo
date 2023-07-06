@@ -34,7 +34,7 @@ async function registerOperators() {
         const ssvNetworkContract = await ssvNetwork.connect(accounts[0])
         // TODO perhaps true for both
         if (i == 0) {
-            await ssvNetworkContract.setRegisterAuth(accounts[0].address, [true, false])
+            await ssvNetworkContract.setRegisterAuth(accounts[0].address, [true, true])
         }
         // Register the validator
         const txResponse = await ssvNetworkContract.registerOperator(
