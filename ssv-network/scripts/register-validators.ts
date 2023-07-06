@@ -105,7 +105,7 @@ async function registerValidators() {
             const { publicKey, privateKey } = await ssvKeys.extractKeys(keystoreData, process.env.KEYSTORE_PASSWORD!);
             const operators = operatorBatches.publicKeys[batchCount].map((operatorPublicKeys: string, index: number) => ({
                 id: operatorBatches.IDs[batchCount][index],
-                publicKey: operatorPublicKeys
+                operatorKey: operatorPublicKeys
             }));
 
             // Step 2: Build shares from operator IDs and public keys
