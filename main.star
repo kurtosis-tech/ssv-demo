@@ -117,7 +117,7 @@ def run(plan, args):
     hardhat_module.run(plan, "scripts/register-operators.ts", "localnet")
     # TODO run this by default
     hardhat_module.run(plan, "scripts/register-validators.ts", "localnet")
-    
+    # npx hardhat run scripts/register-validators.ts --network localnet
 
 
 def launch_ssv_nodes(plan, beacon_url, el_url):
