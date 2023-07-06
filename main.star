@@ -84,6 +84,12 @@ def run(plan, args):
         )
     )
 
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm i -g npm@latest"]
+        )
+    )
 
     plan.exec(
         service_name = "hardhat",
