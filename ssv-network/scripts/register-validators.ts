@@ -13,7 +13,7 @@ let failureCount = 0
 const sharesExpectedLength = 2626
 const batchCount: any = process.env.BATCH_INDEX
 const validatorsToRegister: any = process.env.VALIDATORS_TO_REGISTER
-const keystorePath = `/tmp/validator-keys/`
+const keystorePath = `/tmp/validator-keys/teku-keys`
 
 // Build provider on the Goerli network
 const provider = ethers.getDefaultProvider(process.env.RPC_URI)

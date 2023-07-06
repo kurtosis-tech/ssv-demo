@@ -38,7 +38,7 @@ def run(plan, args):
 
     # TODO productize this bit - for now it knows about the name of the validator and how keys are stored; it shoudln't
     validator_service_name = "cl-client-0-validator"
-    validator_keys = plan.store_service_files(service_name=validator_service_name, src="/validator-keys/node-0-keystores/teku-keys/"))
+    validator_keys = plan.store_service_files(service_name=validator_service_name, src="/validator-keys/node-0-keystores/teku-keys/")
     
     # # spin up hardhat with right env variables
     hardhat_env_vars = {
