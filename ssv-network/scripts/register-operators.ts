@@ -32,8 +32,10 @@ async function registerOperators() {
 
         // Connect the account to use for contract interaction
         const ssvNetworkContract = await ssvNetwork.connect(accounts[0])
-        await ssvNetworkContract.setRegisterAuth(accounts[0].address, [true, false])
-        
+        // TODO perhaps true for both
+        if (i == 0) {
+            await ssvNetworkContract.setRegisterAuth(accounts[0].address, [true, false])
+        }
         // Register the validator
         const txResponse = await ssvNetworkContract.registerOperator(
             abiEncoded,
