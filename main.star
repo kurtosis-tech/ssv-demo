@@ -72,6 +72,21 @@ def run(plan, args):
     plan.exec(
         service_name = "hardhat",
         recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "apk add git"]
+        )
+    )
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "apk add make g++ py3-pip"]
+        )
+    )
+
+
+    plan.exec(
+        service_name = "hardhat",
+        recipe = ExecRecipe(
             command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm install"]
         )
     )
