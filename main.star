@@ -87,20 +87,6 @@ def run(plan, args):
     plan.exec(
         service_name = "hardhat",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "cd /tmp/hardhat && yarn add ssv-keys"]
-        )
-    )
-
-    plan.exec(
-        service_name = "hardhat",
-        recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "cd /tmp/hardhat && yarn add bloxapp/ssv-scanner"]
-        )
-    )    
-
-    plan.exec(
-        service_name = "hardhat",
-        recipe = ExecRecipe(
             command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm install"]
         )
     )
@@ -108,7 +94,7 @@ def run(plan, args):
     plan.exec(
         service_name = "hardhat",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", 'cd /tmp/hardhat && npm install --save-dev "@nomicfoundation/hardhat-network-helpers@^1.0.0" "@nomicfoundation/hardhat-chai-matchers@^1.0.0" "@nomiclabs/hardhat-etherscan@^3.0.0" "@typechain/ethers-v5@^10.1.0" "@typechain/hardhat@^6.1.2" "chai@^4.2.0" "hardhat-gas-reporter@^1.0.8" "solidity-coverage@^0.8.1" "typechain@^8.1.0"']
+            command = ["/bin/sh", "-c", 'cd /tmp/hardhat && npm install --save-dev "@nomicfoundation/hardhat-network-helpers@^1.0.0" "@nomicfoundation/hardhat-chai-matchers@^1.0.0" "@nomiclabs/hardhat-etherscan@^3.0.0" "@typechain/ethers-v5@^10.1.0" "@typechain/hardhat@^6.1.2" "chai@^4.2.0" "hardhat-gas-reporter@^1.0.8" "solidity-coverage@^0.8.1" "typechain@^8.1.0" "ssv-keys@^1.0.1" "bloxapp/ssv-scanner"']
         )
     )
 
@@ -117,7 +103,7 @@ def run(plan, args):
         recipe = ExecRecipe(
             command = ["/bin/sh", "-c", "cd /tmp/hardhat && npm install"]
         )
-    )
+    )   
     
     hardhat_module.compile(plan)
 
