@@ -1,6 +1,6 @@
 eth_network_package = import_module("github.com/kurtosis-tech/eth-network-package/main.star")
 hardhat_module = import_module("github.com/kurtosis-tech/web3-tools/hardhat.star")
-keys = import_module("github.com/kurtosis-tech/ssv-demo/keys.star")
+keys = import_module("/keys.star")
 
 SSV_NODE_IMAGE = "bloxstaking/ssv-node:latest"
 
@@ -140,7 +140,7 @@ def launch_ssv_nodes(plan, beacon_url, el_url):
         config = plan.render_templates(
             config = {
                 "config.yml": struct(
-                    template = read_file("github.com/kurtosis-tech/ssv-demo/templates/config.yml.tmpl"),
+                    template = read_file("/templates/config.yml.tmpl"),
                     data = template_data
                 )
             }
